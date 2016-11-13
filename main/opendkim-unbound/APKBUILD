@@ -1,0 +1,57 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=opendkim-unbound
+_pkgname=opendkim
+pkgver=2.10.3
+pkgrel=1
+pkgdesc="DKIM signing and verifying filter for MTAs"
+url="http://www.opendkim.org"
+arch="all"
+license="custom"
+provides="opendkim"
+makedepends="$depends_dev libressl-dev libmilter-dev unbound-dev"
+pkgusers=opendkim
+pkggroups=opendkim
+subpackages="$pkgname-dev $pkgname-doc $pkgname-libs $pkgname-dbg"
+install="$pkgname.pre-install"
+source="http://downloads.sourceforge.net/project/$_pkgname/$_pkgname-$pkgver.tar.gz
+  opendkim.conf
+  opendkim.initd"
+
+builddir="$srcdir"/$_pkgname-$pkgver
+
+build() {
+	cd "$builddir"
+	./configure \
+		--build=$CBUILD \
+		--host=$CHOST \
+		--prefix=/usr \
+		--with-unbound \
+		--with-ldns \
+		|| return 1
+	make || return 1
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install
+
+	install -Dm644 "$pkgdir"/usr/share/doc/opendkim/opendkim.conf.sample \
+		"$pkgdir"/etc/opendkim/opendkim.conf.sample
+	install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$_pkgname/LICENSE
+	install -Dm644 LICENSE.Sendmail \
+		"$pkgdir"/usr/share/licenses/$_pkgname/LICENSE.Sendmail
+
+	install -m755 -D "$srcdir"/"$_pkgname".initd "$pkgdir"/etc/init.d/"$_pkgname"
+	install -m644 -D "$srcdir"/"$_pkgname".conf "$pkgdir"/etc/conf.d/"$_pkgname"
+}
+
+md5sums="916e691cdd16cfabd1cd6efe745323f9  opendkim-2.10.3.tar.gz
+5c8601db0fb9436aceae9827655cabad  opendkim.conf
+5c8ac48d8dfd3bc0a015cf1a99314915  opendkim.initd"
+sha256sums="43a0ba57bf942095fe159d0748d8933c6b1dd1117caf0273fa9a0003215e681b  opendkim-2.10.3.tar.gz
+f3ccca51dd4138a30add20a279a57eb2ad959c415db2c6dcc78f2974537f1d79  opendkim.conf
+eaa6b0dec87147099959f825b225ed01cd14c4317d1ee514b4860e66e195c5f7  opendkim.initd"
+sha512sums="97923e533d072c07ae4d16a46cbed95ee799aa50f19468d8bc6d1dc534025a8616c3b4b68b5842bc899b509349a2c9a67312d574a726b048c0ea46dd4fcc45d8  opendkim-2.10.3.tar.gz
+b5f38fdb2572186c8c72fbe1c9be8a65b4b900c35812b9079739bcb53d8ff6c4eb7e5ef62e3059180680257bdbeb33b76674c562b0eb1865319fe1ac6e303e69  opendkim.conf
+d335f77fb505eade36554db5a885fa6f2725fae4d4efb6abb76385849b5e74b3a796f443ce9544b6a476af65deef0b4f7d8207640b3b48b187fe74954ef23339  opendkim.initd"

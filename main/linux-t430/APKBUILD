@@ -1,0 +1,175 @@
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+
+_buildflavor="t430"
+_config=config-$_buildflavor.${CARCH}
+pkgname=linux-$_buildflavor
+pkgver=4.4.30
+case $pkgver in
+*.*.*)	_kernver=${pkgver%.*};;
+*.*)	_kernver=${pkgver};;
+esac
+pkgrel=0
+pkgdesc="Linux kernel with grsecurity"
+url=http://grsecurity.net
+arch="x86_64"
+license="GPL2"
+depends="mkinitfs linux-firmware"
+makedepends="perl sed installkernel bash gmp-dev bc linux-headers mpfr-dev
+	mpc1-dev ncurses-dev"
+options="!strip"
+install=
+subpackages="$pkgname-dev"
+source="http://ftp.kernel.org/pub/linux/kernel/v4.x/linux-$_kernver.tar.xz
+	http://ftp.kernel.org/pub/linux/kernel/v4.x/patch-$pkgver.xz
+	http://dev.alpinelinux.org/~ncopa/grsec/grsecurity-3.1-$pkgver-201604252206-alpine.patch
+	fix-spi-nor-namespace-clash.patch
+	imx6q-no-unclocked-sleep.patch
+	gcc6.patch
+	config-t430.x86_64"
+builddir="$srcdir"/build-$_buildflavor
+
+prepare() {
+	local _patch_failed=
+	cd "$srcdir"/linux-$_kernver
+	if [ "${pkgver%.0}" = "$pkgver" ]; then
+		msg "Applying patch-$pkgver.xz"
+		unxz -c < "$srcdir"/patch-$pkgver.xz | patch -p1 -N || return 1
+	fi
+
+	# first apply patches in specified order
+	for i in $source; do
+		local file=${i%::*}
+		case $file in
+		*.patch)
+			msg "Applying $file..."
+			if ! patch -s -p1 -N -i "$srcdir"/${file##*/}; then
+				echo $file >>failed
+				_patch_failed=1
+			fi
+			;;
+		esac
+	done
+
+	if ! [ -z "$_patch_failed" ]; then
+		error "The following patches failed:"
+		cat failed
+		return 1
+	fi
+
+	# remove localversion from patch if any
+	rm -f localversion*
+
+	mkdir -p "$builddir"
+
+	echo "-$pkgrel-$_buildflavor" > "$builddir"/localversion-alpine \
+		|| return 1
+
+	cp "$srcdir"/$_config "$builddir"/.config || return 1
+	make -C "$srcdir"/linux-$_kernver O="$builddir" HOSTCC="${CC:-gcc}" \
+		silentoldconfig || return 1
+}
+
+menuconfig() {
+	cd "$builddir" || return 1
+	make ARCH="${CARCH}" menuconfig
+	cp .config "$startdir"/$_config
+}
+
+build() {
+	export GCC_SPECS=hardenednopie.specs
+	cd "$builddir" || return 1
+	make CC="${CC:-gcc}" KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" \
+		KCFLAGS="-fno-pie" || return 1
+}
+
+package() {
+	local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
+
+	cd "$builddir"
+
+	mkdir -p "$pkgdir"/boot "$pkgdir"/lib/modules
+
+	make -j1 modules_install firmware_install install \
+		INSTALL_MOD_PATH="$pkgdir" INSTALL_PATH="$pkgdir"/boot || return 1
+
+	rm -f "$pkgdir"/lib/modules/${_abi_release}/build \
+		"$pkgdir"/lib/modules/${_abi_release}/source
+	rm -rf "$pkgdir"/lib/firmware
+
+	install -D include/config/kernel.release \
+		"$pkgdir"/usr/share/kernel/$_buildflavor/kernel.release
+}
+
+dev() {
+	local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
+	# copy the only the parts that we really need for build 3rd party
+	# kernel modules and install those as /usr/src/linux-headers,
+	# simlar to what ubuntu does
+	#
+	# this way you dont need to install the 300-400 kernel sources to
+	# build a tiny kernel module
+	#
+	pkgdesc="Headers and script for third party modules for $_buildflavor kernel"
+	depends="gmp-dev bash"
+	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
+
+	# first we import config, run prepare to set up for building
+	# external modules, and create the scripts
+	mkdir -p "$dir"
+	cp "$srcdir"/config-$_buildflavor.${CARCH} "$dir"/.config
+	echo "-$pkgrel-$_buildflavor" > "$dir"/localversion-alpine \
+		|| return 1
+	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" HOSTCC="${CC:-gcc}" \
+		KCFLAGS="-fno-pie" \
+		silentoldconfig prepare modules_prepare scripts
+
+	# remove the stuff that poits to real sources. we want 3rd party
+	# modules to believe this is the soruces
+	rm "$dir"/Makefile "$dir"/source
+
+	# copy the needed stuff from real sources
+	#
+	# this is taken from ubuntu kernel build script
+	# http://kernel.ubuntu.com/git?p=ubuntu/ubuntu-jaunty.git;a=blob;f=debian/rules.d/3-binary-indep.mk;hb=HEAD
+	cd "$srcdir"/linux-$_kernver
+	find . -path './include/*' -prune -o -path './scripts/*' -prune \
+		-o -type f \( -name 'Makefile*' -o -name 'Kconfig*' \
+		-o -name 'Kbuild*' -o -name '*.sh' -o -name '*.pl' \
+		-o -name '*.lds' \) | cpio -pdm "$dir"
+	cp -a drivers/media/dvb/dvb-core/*.h "$dir"/drivers/media/dvb/dvb-core
+	cp -a drivers/media/video/*.h "$dir"/drivers/media/video
+	cp -a drivers/media/dvb/frontends/*.h "$dir"/drivers/media/dvb/frontends
+	cp -a scripts include "$dir"
+	find $(find arch -name include -type d -print) -type f \
+		| cpio -pdm "$dir"
+
+	install -Dm644 "$builddir"/Module.symvers "$dir"/Module.symvers
+
+	mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
+	ln -sf /usr/src/linux-headers-${_abi_release} \
+		"$subpkgdir"/lib/modules/${_abi_release}/build
+
+}
+
+md5sums="9a78fa2eb6c68ca5a40ed5af08142599  linux-4.4.tar.xz
+4d42a3586d523dacfa09b1d12d981ef1  patch-4.4.30.xz
+27d276f01dad7a542e1093f11b6f8fac  grsecurity-3.1-4.4.30-201604252206-alpine.patch
+c32f1d7517a095a2645fc1c7dec5db8f  fix-spi-nor-namespace-clash.patch
+b11c29ee88f7f537973191036d48bee7  imx6q-no-unclocked-sleep.patch
+90e0fca6cb7bca277394b0db7f605098  gcc6.patch
+53f17cd4b019169005c92cef63ac23d1  config-t430.x86_64"
+sha256sums="401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2  linux-4.4.tar.xz
+c310c7f64fb00b728729eb5b7588a1b10573acf5bfef920d28fe1da348e121c6  patch-4.4.30.xz
+ee8a65d037fd59b981a34a1f120d3884cd3ef201252c4175b8a5f290d0252e62  grsecurity-3.1-4.4.30-201604252206-alpine.patch
+b8ce28c61663dbd92f7e1c862c042c88c4d0459ce15f6e6ea121e20705b66212  fix-spi-nor-namespace-clash.patch
+7e8a954750139a421a76e414e19a3b57645c9ec70e6c14a6b7708a3fa0cfd5e4  imx6q-no-unclocked-sleep.patch
+21640b417cb9a389bf7be6a11dc71a481ec76fcfcc758992a9be158ab6a643e8  gcc6.patch
+7aee26dd062147e5dcc829e799aea3506d128212bfd5b07e41084f40469d08b6  config-t430.x86_64"
+sha512sums="13c8459933a8b80608e226a1398e3d1848352ace84bcfb7e6a4a33cb230bbe1ab719d4b58e067283df91ce5311be6d2d595fc8c19e2ae6ecc652499415614b3e  linux-4.4.tar.xz
+621c98e0ced48eafc2b0a76e67d6a0a11a4e2a4a78b57ed2c62127554e5d358ed8dfb4f7bf36eca870b45fa7d111bef29cf24bc861c274007f2a0992b004386a  patch-4.4.30.xz
+df24f3b6888afa45d7f149265487c1312a405a1d4345d324c7c21e7f073d9ef302c4ab2f5dba5c004caaef5ef687717285fd4d35f319b6cab7d41cc9baed6b9e  grsecurity-3.1-4.4.30-201604252206-alpine.patch
+410fe7dae27cb4998d17a441a5b2a19dd350636ead2de97d4ef5317501d9e82e2550bfca0f022c9be6296907c076c381e1e13060d1900ff26ee7d47f234fb104  fix-spi-nor-namespace-clash.patch
+9980eb10f529bc5ce482ab0a0037febbc982b528c3e4d02fc4547e6dd45dc529a7b1711d0c89f942b1ae27842c3794b68a6b8959ef80f6fd00183d3a591cea07  imx6q-no-unclocked-sleep.patch
+edcebc229956a05621ec1c89039b56aa61b468c74b54420ff72bd08658b65d29d6af385a7d78d1ce4b39889b407106b99efe7309f8a82974a74eb9edb9e89b64  gcc6.patch
+0dcc0e9201eb149fa146ebe8fdd80546627f2ec817d7afd360d9c771cfe8665f8f3e6c7d0c9968b10401c7424aa968f97bee3d042b2665d1e4f0b614c40b62c8  config-t430.x86_64"

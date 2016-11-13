@@ -1,0 +1,40 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=ttf-robotomono
+pkgver=20150601
+pkgrel=0
+pkgdesc="Roboto Mono fonts"
+url="https://github.com/google/fonts/tree/master/apache/robotomono"
+license="OFL"
+arch="noarch"
+source="https://github.com/google/fonts/raw/master/apache/robotomono/RobotoMono-Bold.ttf
+https://github.com/google/fonts/raw/master/apache/robotomono/RobotoMono-Light.ttf
+https://github.com/google/fonts/raw/master/apache/robotomono/RobotoMono-Medium.ttf
+https://github.com/google/fonts/raw/master/apache/robotomono/RobotoMono-Regular.ttf
+https://github.com/google/fonts/raw/master/apache/robotomono/RobotoMono-Thin.ttf"
+
+build() {
+	return 0
+}
+
+package() {
+
+  mkdir -p "$pkgdir"/usr/share/fonts/truetype/robotomono
+	install -D -t "$pkgdir"/usr/share/fonts/truetype/robotomono "$srcdir"/*.ttf 
+}
+
+md5sums="cf661842dcc7e1cc63147893ea8f47e8  RobotoMono-Bold.ttf
+9b4c4c06ac376ebef3ae1c83555d6767  RobotoMono-Light.ttf
+548b8b0a28c87e0265346c17b1238f00  RobotoMono-Medium.ttf
+e2642a6882ef2432ee9ac442691a4384  RobotoMono-Regular.ttf
+d39c55b13b4cc7c89cda63c57d8edd65  RobotoMono-Thin.ttf"
+sha256sums="6250e98e33a56ab2ca07bc61835a8f53ed85d231347fc9c74136c2d356b63875  RobotoMono-Bold.ttf
+4e62f5daf13403a6846a0c838e487521b56294bb5a00f07d0e75063b7ed74259  RobotoMono-Light.ttf
+607e473da298c66f4c86abca2da5b21a5d469a8728a9e3bae2437a061a368973  RobotoMono-Medium.ttf
+bfb5fbccb5c5d32065d9029c80877a2118b4f3be06d328d7ea4420df7c0fcf64  RobotoMono-Regular.ttf
+b27a635fdffee78fab7afc08b2c5d9d11c1c189dbb543d4d5852e5eb9d22655f  RobotoMono-Thin.ttf"
+sha512sums="6aec2b4631fe42e6983f98b7416e2c5f667e471ee37e99fd3f933ee5aff80274e2d59fada93bb5da3ce79119030f6982ddb3e085975271f8fd0ab41dc214ecb5  RobotoMono-Bold.ttf
+32a0d75cb1318fcee07c16ae28e0e9f7f375ba6307574b3e53ab7f0ad7c1802d5863e2dc5e424fb2620ebdc6abc527d81207e1dd023d075d6ec078474f8371d5  RobotoMono-Light.ttf
+3c5b3b8ff469714f49efb987de0d374f469ce9d19e7a34f10c00b56acfb5b8fe900533836d3d15a4856a06457b890a734612482f6131e1ffe7e6e691a3802609  RobotoMono-Medium.ttf
+26edaeea2676af16f7c25a0f08a6e89b5a04d255021b4f7074ca8a35a52e38e90cd3210f06b5f2bbc37caa1b3ebed7bf18be72336f1b8596a074184a026a3513  RobotoMono-Regular.ttf
+3b29d0487b879f23eec3caec6430ecacb6b1eaa9ad0814fed51fe336b61950e669651ad7e8812ffcf49afef56eafb024ab9c63aba927d7ccf706471ee7b5a9aa  RobotoMono-Thin.ttf"

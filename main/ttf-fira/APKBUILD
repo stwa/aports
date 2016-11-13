@@ -1,0 +1,24 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=ttf-fira
+pkgver=4.202
+pkgrel=0
+pkgdesc="Fira fonts"
+url="http://mozilla.github.io/Fira/"
+license="OFL"
+arch="noarch"
+source="$pkgname-$pkgver.zip::https://github.com/mozilla/Fira/archive/$pkgver.zip"
+
+builddir="$srcdir/Fira-$pkgver"
+build() {
+	return 0
+}
+
+package() {
+	mkdir -p "$pkgdir"/usr/share/fonts/truetype/fira
+	install -D -t "$pkgdir"/usr/share/fonts/truetype/fira "$builddir"/ttf/*.ttf
+}
+
+md5sums="15c55f4ab550934a06d16fa66357de5f  ttf-fira-4.202.zip"
+sha256sums="2d2fb71b186ddd4cdbbccca98ed9bd6a8a94bd05865f94b39b71af80eb3736a4  ttf-fira-4.202.zip"
+sha512sums="9d21da2cc6d483cf91f4593d85cf2e76f79e3e9255823343bdebaa4470b9266c2d0a390bacba35bfb3d4011fc2deae598946d362a5f442720451986b962ef385  ttf-fira-4.202.zip"

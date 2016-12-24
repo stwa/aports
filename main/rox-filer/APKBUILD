@@ -1,0 +1,39 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=rox-filer
+pkgver=2.11
+pkgrel=0
+pkgdesc="A small and fast file manager"
+url="http://rox.sourceforge.net/desktop/ROX-Filer.html"
+arch="all"
+license="GPL"
+makedepends="xterm gtk+2.0-dev libsm-dev libxml2-dev"
+source="http://downloads.sourceforge.net/project/rox/rox/2.11/rox-filer-2.11.tar.bz2"
+
+builddir="$srcdir/$pkgname-$pkgver"
+build() {
+	cd "$builddir"
+	ROX-Filer/AppRun
+}
+
+package() {
+	cd "$builddir"
+
+	rm -rf ROX-Filer/{src,build}
+
+	install -d ${pkgdir}/usr/bin
+	install -d ${pkgdir}/usr/share/Choices/MIME-types
+
+	install -m755 Choices/MIME-types/* ${pkgdir}/usr/share/Choices/MIME-types/
+	cp -r ROX-Filer ${pkgdir}/usr/share/
+
+	echo -en '#!/bin/sh\nexec /usr/share/ROX-Filer/AppRun "$@"' > ${pkgdir}/usr/bin/rox-filer
+	chmod 0755 ${pkgdir}/usr/bin/rox-filer
+
+	ln -sf ./ROX-Filer ${pkgdir}/usr/share/rox
+	ln -sf ./rox-filer ${pkgdir}/usr/bin/rox
+}
+
+md5sums="0eebf05a67f7932367750ebf9faf215d  rox-filer-2.11.tar.bz2"
+sha256sums="a929bd32ee18ef7a2ed48b971574574592c42e34ae09f36604bf663d7c101ba8  rox-filer-2.11.tar.bz2"
+sha512sums="2ef5e7a5d6f4bbb825d6f01725ad4149b9cabfb6fe82c33631bb145f5a3c84e345c372b7698170c1ef78b30ffbc4665495cc266da4828cc8b4b256b592b2c50b  rox-filer-2.11.tar.bz2"

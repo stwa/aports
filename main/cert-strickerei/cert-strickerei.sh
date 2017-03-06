@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # working directory
 BASEDIR="/etc/cert-strickerei"
@@ -16,7 +16,7 @@ account_key="$BASEDIR"/.account.key
 letsenc_x1="$BASEDIR/.lets-encrypt-x1-cross-signed.pem"
 letsenc_x3="$BASEDIR/.lets-encrypt-x3-cross-signed.pem"
 acme_tiny="$BASEDIR"/.acme_tiny.py
-acme_tiny_checksum="22c296e23411dbd3c88d99a65145716381e731d3e0168e37c4b94aac3052eb6656b7c45e6454a2067dda8add65370e4689ee88420470fe22fa3b297d0ce6279a  .acme_tiny.py"
+acme_tiny_checksum="c53352240fa43b6b7b0e4a76c6a9cb7dcbf60e876aea5749799c78bca3fab84b90742401da72956097ec3b10e1cc5930d8a93bcbd9cdb81274f8de1203d9560b  $acme_tiny"
 
 #-------------------------------------------------------------------------------
 # DO NOT EDIT AFTER THIS COMMENT!
@@ -35,7 +35,10 @@ create_cert_request() {
 
 create_signed_cert() {
 	local target="$1" request="$2"
-	sudo -u nobody -g nobody python2.7 "$acme_tiny" --account-key "$account_key" --csr "$request" --acme-dir "$acme_dir" > "$target"
+	crt=$(sudo -u nobody -g nobody python2 "$acme_tiny" --account-key "$account_key" --csr "$request" --acme-dir "$acme_dir")
+	if [ "$?" -eq "0" ]; then
+		echo "$crt" > "$target"
+	fi
 }
 
 create_chain_bundle() {
@@ -123,7 +126,7 @@ fi
 # check for and download intermediate certs
 for pem in "$letsenc_x1" "$letsenc_x3"; do
 	if [ ! -e "$pem" ]; then
-		local filename=$(basename "$pem")
+		filename=$(basename "$pem")
 		wget -O- "https://letsencrypt.org/certs/${filename#.}" > "$pem"
 	fi
 done

@@ -4,7 +4,7 @@
 _buildflavor="t430"
 _config=config-$_buildflavor.${CARCH}
 pkgname=linux-$_buildflavor
-pkgver=4.4.45
+pkgver=4.9.24
 case $pkgver in
 *.*.*)	_kernver=${pkgver%.*};;
 *.*)	_kernver=${pkgver};;
@@ -22,11 +22,7 @@ install=
 subpackages="$pkgname-dev"
 source="https://kernel.org/pub/linux/kernel/v4.x/linux-$_kernver.tar.xz
 	https://kernel.org/pub/linux/kernel/v4.x/patch-$pkgver.xz
-	http://dev.alpinelinux.org/~ncopa/grsec/grsecurity-3.1-$pkgver-201604252206-alpine.patch
-
-	fix-spi-nor-namespace-clash.patch
-	imx6q-no-unclocked-sleep.patch
-	gcc6.patch
+	http://dev.alpinelinux.org/~ncopa/grsec/grsecurity-3.1-$pkgver-201704220732.patch
 
 	config-t430.x86_64"
 builddir="$srcdir"/build-$_buildflavor
@@ -127,23 +123,21 @@ dev() {
 	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" HOSTCC="${CC:-gcc}" \
 		silentoldconfig prepare modules_prepare scripts
 
-	# remove the stuff that poits to real sources. we want 3rd party
+	# remove the stuff that points to real sources. we want 3rd party
 	# modules to believe this is the soruces
 	rm "$dir"/Makefile "$dir"/source
 
 	# copy the needed stuff from real sources
 	#
 	# this is taken from ubuntu kernel build script
-	# http://kernel.ubuntu.com/git?p=ubuntu/ubuntu-jaunty.git;a=blob;f=debian/rules.d/3-binary-indep.mk;hb=HEAD
+	# http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
 	cd "$srcdir"/linux-$_kernver
-	find . -path './include/*' -prune -o -path './scripts/*' -prune \
-		-o -type f \( -name 'Makefile*' -o -name 'Kconfig*' \
-		-o -name 'Kbuild*' -o -name '*.sh' -o -name '*.pl' \
-		-o -name '*.lds' \) | cpio -pdm "$dir"
-	cp -a drivers/media/dvb/dvb-core/*.h "$dir"/drivers/media/dvb/dvb-core
-	cp -a drivers/media/video/*.h "$dir"/drivers/media/video
-	cp -a drivers/media/dvb/frontends/*.h "$dir"/drivers/media/dvb/frontends
-	cp -a scripts include "$dir"
+	find . -path './include/*' -prune \
+		   -o -path './scripts/*' -prune -o -type f \
+		   \( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
+			 -name '*.sh' -o -name '*.pl' -o -name '*.lds' \) \
+		   -print | cpio -pdm "$dir" || return 1
+	cp -a scripts include "$dir" || return 1
 	find $(find arch -name include -type d -print) -type f \
 		| cpio -pdm "$dir"
 
@@ -155,24 +149,7 @@ dev() {
 
 }
 
-md5sums="9a78fa2eb6c68ca5a40ed5af08142599  linux-4.4.tar.xz
-8c83b4bc6b233bd87d8f75e92086583d  patch-4.4.45.xz
-8920b650a456104174f522f0814f5f17  grsecurity-3.1-4.4.45-201604252206-alpine.patch
-c32f1d7517a095a2645fc1c7dec5db8f  fix-spi-nor-namespace-clash.patch
-b11c29ee88f7f537973191036d48bee7  imx6q-no-unclocked-sleep.patch
-90e0fca6cb7bca277394b0db7f605098  gcc6.patch
-1ecdd2e639a1903e5819dd640c4d814c  config-t430.x86_64"
-sha256sums="401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2  linux-4.4.tar.xz
-8d359628e1b6918308998510f6f5724b7f5f27016bcaee3760f4ad1f4a8a93fb  patch-4.4.45.xz
-7e765be5c0e747369a67adb6ea90808ff87ad860ac07167422875e6173eb06c6  grsecurity-3.1-4.4.45-201604252206-alpine.patch
-b8ce28c61663dbd92f7e1c862c042c88c4d0459ce15f6e6ea121e20705b66212  fix-spi-nor-namespace-clash.patch
-7e8a954750139a421a76e414e19a3b57645c9ec70e6c14a6b7708a3fa0cfd5e4  imx6q-no-unclocked-sleep.patch
-21640b417cb9a389bf7be6a11dc71a481ec76fcfcc758992a9be158ab6a643e8  gcc6.patch
-f5fd72d9497864224a50a6f294b8e31c4abbcf76c576e2f5ec47d7493effbe96  config-t430.x86_64"
-sha512sums="13c8459933a8b80608e226a1398e3d1848352ace84bcfb7e6a4a33cb230bbe1ab719d4b58e067283df91ce5311be6d2d595fc8c19e2ae6ecc652499415614b3e  linux-4.4.tar.xz
-37c8fb23b9456e67f515ac3baf03a5eecd1fcbf534d222564579ba47db19c2ccff92275fc977279c49d1e8df3c7e51e64552446f1789cd08c7d994b8367bfe2b  patch-4.4.45.xz
-87219cee934ababb5dcbfd6bdf71d4b53778305ab3bd4bd76d433603ec0a12d73c536aee2892b9adf0ae39ec7bcceb7d9f9a64bfbc854825f427561a4061d392  grsecurity-3.1-4.4.45-201604252206-alpine.patch
-410fe7dae27cb4998d17a441a5b2a19dd350636ead2de97d4ef5317501d9e82e2550bfca0f022c9be6296907c076c381e1e13060d1900ff26ee7d47f234fb104  fix-spi-nor-namespace-clash.patch
-9980eb10f529bc5ce482ab0a0037febbc982b528c3e4d02fc4547e6dd45dc529a7b1711d0c89f942b1ae27842c3794b68a6b8959ef80f6fd00183d3a591cea07  imx6q-no-unclocked-sleep.patch
-edcebc229956a05621ec1c89039b56aa61b468c74b54420ff72bd08658b65d29d6af385a7d78d1ce4b39889b407106b99efe7309f8a82974a74eb9edb9e89b64  gcc6.patch
-8be490a311aabc4d5f0f69d64b1507d9a85d424419193d6a04d5e2a564783bfdf579195c615263da80e4bdadbf505dd0f9f7c68b053871784a0da1699b206706  config-t430.x86_64"
+sha512sums="bf67ff812cc3cb7e5059e82cc5db0d9a7c5637f7ed9a42e4730c715bf7047c81ed3a571225f92a33ef0b6d65f35595bc32d773356646df2627da55e9bc7f1f1a  linux-4.9.tar.xz
+c5619f95e6f838175491c1f8ba1fe13b37200984dfd241af3fcbb063de4d3b18948ffc0fda7bb594a92f0ec3332d35a2a255e830a7e1d68a5ecb8da57a8bd44b  patch-4.9.24.xz
+e7e9e8f88be6bff9957097001bf4eea1044be6943b1ffc7fb30a0ce7c8b5927b8191a02bda860aa4ef77eeed059e81268f7fdebef0f4f6ce2401f1f8c6809d2c  grsecurity-3.1-4.9.24-201704220732.patch
+5eea4f997babd06e81c5e5d1506e6e920398a1ccd2727583e72ae3f607d88abe90b071445e6524137ba22a20b0afc961db952b80f2c8b6b5ac93a16474a9dd9c  config-t430.x86_64"

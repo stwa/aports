@@ -1,0 +1,50 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=st
+pkgver=0.7
+pkgrel=1
+pkgdesc="a simple terminal implementation for X"
+url="http://st.suckless.org/"
+arch="all"
+license="MIT/X"
+depends="ncurses-terminfo"
+depends_dev=""
+makedepends="$depends_dev fontconfig-dev freetype-dev libx11-dev libxft-dev
+	libxext-dev"
+install=""
+subpackages="$pkgname-doc $pkgname-dbg"
+source="http://dl.suckless.org/$pkgname/$pkgname-$pkgver.tar.gz
+	terminfo.patch
+	st-copyurl.patch
+	st-scrollback.patch
+	config.h"
+
+builddir="$srcdir"/$pkgname-$pkgver
+build() {
+	cd "$builddir"
+	cp "$srcdir/config.h" config.h || return 1
+	make || return 1
+}
+
+package() {
+	cd "$builddir"
+	make PREFIX=/usr DESTDIR="$pkgdir" install || return 1
+	mkdir -p "$pkgdir"/usr/share/applications
+
+	cat >"$pkgdir"/usr/share/applications/st.desktop <<EOF
+[Desktop Entry]
+Name=st
+Comment=st is a simple virtual terminal emulator for X which sucks less
+Exec=st
+Terminal=false
+Type=Application
+Icon=gnome-xterm
+Categories=System;TerminalEmulator;
+EOF
+}
+
+sha512sums="9384820d373bfaaef1887290351d8c34abeef26cd7d50ddbae56ffb865864bcca9be798c6238bf1ce595ba7c317f2c1d97653055da0aa302e322eeee822768d4  st-0.7.tar.gz
+9099d7c7dc557583179ec6d630419b067297520f788df6623236822cc4b6d2288ca93d25f3ae6c9169ca2a2357e5b7955eb1c0463b01efad5ee9c2e8c5db35ee  terminfo.patch
+5b6dabe42e4cac84d64d7d1c8799f7803b4bc72f93393b3d0d301e0275b49e7719a869ee4c38bf7cccd82d25d17dccfacf7c0c40a86a7799b620ca9af7112bac  st-copyurl.patch
+cb0d22bfc2b189430990564ced8ea0ed2b07a6eaa5255980134509fa60a0b933f696d1a96065167831541f84911c8a9f369da6863acb01fab2e898484a5deed3  st-scrollback.patch
+65d77f8894691b7d0d355b93c51d8bc0d5914664af985265932c39f5a7e60e92125ef02ac00912e2a00d7620da3528c3318dbb9de0dd476fb49ca8ffa30d0fd0  config.h"

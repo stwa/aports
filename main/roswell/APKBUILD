@@ -1,0 +1,28 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=roswell
+pkgver=17.4.8.76
+pkgrel=0
+pkgdesc="Lisp installer and launcher"
+url="https://github.com/snmsts/roswell"
+arch="all"
+license="MIT"
+depends="curl"
+makedepends="autoconf automake curl-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/roswell/$pkgname/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	./bootstrap
+	./configure --prefix=/usr --sysconfdir=/etc
+	make
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="4cbdf3d11cb54489aa06c00ce3e1a74488767990b7494a934ecceeb920322d4b6045f55e136877378bde956980367628c52222f253d6bf86b232c25425cead53  roswell-17.4.8.76.tar.gz"

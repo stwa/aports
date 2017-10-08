@@ -4,7 +4,7 @@
 _buildflavor="t430"
 _config=config-$_buildflavor.${CARCH}
 pkgname=linux-$_buildflavor
-pkgver=4.9.24
+pkgver=4.9.50
 case $pkgver in
 *.*.*)	_kernver=${pkgver%.*};;
 *.*)	_kernver=${pkgver};;
@@ -22,7 +22,7 @@ install=
 subpackages="$pkgname-dev"
 source="https://kernel.org/pub/linux/kernel/v4.x/linux-$_kernver.tar.xz
 	https://kernel.org/pub/linux/kernel/v4.x/patch-$pkgver.xz
-	http://dev.alpinelinux.org/~ncopa/grsec/grsecurity-3.1-$pkgver-201704220732.patch
+	http://dev.alpinelinux.org/~ncopa/grsec/hardened-3.1-$pkgver-201704252333-alpine.patch
 
 	config-t430.x86_64"
 builddir="$srcdir"/build-$_buildflavor
@@ -150,6 +150,6 @@ dev() {
 }
 
 sha512sums="bf67ff812cc3cb7e5059e82cc5db0d9a7c5637f7ed9a42e4730c715bf7047c81ed3a571225f92a33ef0b6d65f35595bc32d773356646df2627da55e9bc7f1f1a  linux-4.9.tar.xz
-c5619f95e6f838175491c1f8ba1fe13b37200984dfd241af3fcbb063de4d3b18948ffc0fda7bb594a92f0ec3332d35a2a255e830a7e1d68a5ecb8da57a8bd44b  patch-4.9.24.xz
-e7e9e8f88be6bff9957097001bf4eea1044be6943b1ffc7fb30a0ce7c8b5927b8191a02bda860aa4ef77eeed059e81268f7fdebef0f4f6ce2401f1f8c6809d2c  grsecurity-3.1-4.9.24-201704220732.patch
-5eea4f997babd06e81c5e5d1506e6e920398a1ccd2727583e72ae3f607d88abe90b071445e6524137ba22a20b0afc961db952b80f2c8b6b5ac93a16474a9dd9c  config-t430.x86_64"
+752b09fc50f1f91bbf0b1ea7c49b7cc2bb601103c90de80086dde0e3baa745ebcdb0d953ac49c3db5d8dcd95cfdc45e09d29e7304f1baf2666889464fd70a39b  patch-4.9.50.xz
+205a75130683365a75e9f58c01c99ff251076f3006fe582883efc1f29a5207c8da61e4261ce8f19de222ec310fd2404123b29d51edcbd235d30b30637efbcf0e  hardened-3.1-4.9.50-201704252333-alpine.patch
+1dca7b9dce43caf176530b7b49af67b43a203396f4a78ccfad24ff1b86d6fc49e9631f374748e9612cd84d3ac1b785e8c0c4cc3983eb30a147f45e562d08e07e  config-t430.x86_64"

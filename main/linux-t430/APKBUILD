@@ -1,31 +1,44 @@
-# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
-# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 
-_buildflavor="t430"
-_config=config-$_buildflavor.${CARCH}
-pkgname=linux-$_buildflavor
-pkgver=4.9.50
+_mainflavor=t430
+pkgname=linux-$_mainflavor
+pkgver=4.9.73
 case $pkgver in
 *.*.*)	_kernver=${pkgver%.*};;
 *.*)	_kernver=${pkgver};;
 esac
 pkgrel=0
-pkgdesc="Linux kernel with grsecurity"
-url=http://grsecurity.net
-arch="x86_64"
-license="GPL2"
-depends="mkinitfs linux-firmware"
+pkgdesc="Linux kernel with hardening patches"
+url="http://alpinelinux.org"
+depends="mkinitfs"
 makedepends="perl sed installkernel bash gmp-dev bc linux-headers mpfr-dev
-	mpc1-dev ncurses-dev"
-options="!strip"
+	mpc1-dev elfutils-dev ncurses-dev"
+options="!strip !check"
 install=
-subpackages="$pkgname-dev"
 source="https://kernel.org/pub/linux/kernel/v4.x/linux-$_kernver.tar.xz
 	https://kernel.org/pub/linux/kernel/v4.x/patch-$pkgver.xz
-	http://dev.alpinelinux.org/~ncopa/grsec/hardened-3.1-$pkgver-201704252333-alpine.patch
+	http://dev.alpinelinux.org/~ncopa/grsec/hardened-3.1-$pkgver-201704252333-alpine2.patch
+	zfs-fix.patch
 
-	config-t430.x86_64"
-builddir="$srcdir"/build-$_buildflavor
+	config-t430.x86_64
+	"
+subpackages="$pkgname-dev:_dev"
+_flavors=
+for _i in $source; do
+	case $_i in
+	config-*.$CARCH)
+		_f=${_i%.$CARCH}
+		_f=${_f#config-}
+		_flavors="$_flavors ${_f}"
+		if [ "linux-$_f" != "$pkgname" ]; then
+			subpackages="$subpackages linux-${_f} linux-${_f}-dev:_dev"
+		fi
+		;;
+	esac
+done
+
+arch="x86 x86_64 armhf"
+license="GPL-2.0"
 
 prepare() {
 	local _patch_failed=
@@ -58,51 +71,82 @@ prepare() {
 	# remove localversion from patch if any
 	rm -f localversion*
 
-	mkdir -p "$builddir"
+	for i in $_flavors; do
+		local _config=config-$i.${CARCH}
+		local _builddir="$srcdir"/build-$i
+		mkdir -p "$_builddir"
+		echo "-$pkgrel-$i" > "$srcdir"/build-$i/localversion-alpine \
+			|| return 1
 
-	echo "-$pkgrel-$_buildflavor" > "$builddir"/localversion-alpine \
-		|| return 1
-
-	cp "$srcdir"/$_config "$builddir"/.config || return 1
-	make -C "$srcdir"/linux-$_kernver \
-		O="$builddir" \
-		HOSTCC="${CC:-gcc}" \
-		silentoldconfig || return 1
-}
-
-menuconfig() {
-	cd "$builddir" || return 1
-	make ARCH="${CARCH}" menuconfig
-	cp .config "$startdir"/$_config
+		cp "$srcdir"/$_config "$_builddir"/.config || return 1
+		make -C "$srcdir"/linux-$_kernver \
+			O="$_builddir" \
+			HOSTCC="${CC:-gcc}" \
+			silentoldconfig || return 1
+	done
 }
 
 build() {
-	cd "$builddir" || return 1
-	make CC="${CC:-gcc}" \
-		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" \
-		|| return 1
+	for i in $_flavors; do
+		cd "$srcdir"/build-$i
+		make CC="${CC:-gcc}" \
+			KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" \
+			|| return 1
+	done
 }
 
-package() {
+_package() {
+	local _buildflavor="$1" _outdir="$2"
 	local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
 
-	cd "$builddir"
+	cd "$srcdir"/build-$_buildflavor || return 1
 
-	mkdir -p "$pkgdir"/boot "$pkgdir"/lib/modules
+	mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
 
-	make -j1 modules_install firmware_install install \
-		INSTALL_MOD_PATH="$pkgdir" INSTALL_PATH="$pkgdir"/boot || return 1
+	local _install
+	case "$CARCH" in
+	arm*)
+		local _dtbdir="$_outdir"/usr/lib/linux-${_abi_release}
+		mkdir -p "$_dtbdir"
+		for i in arch/arm/boot/dts/*.dtb ; do
+			install -m644 "$i" "$_dtbdir"
+		done
 
-	rm -f "$pkgdir"/lib/modules/${_abi_release}/build \
-		"$pkgdir"/lib/modules/${_abi_release}/source
-	rm -rf "$pkgdir"/lib/firmware
+		_install=zinstall
+		;;
+	*)
+		_install=install
+		;;
+	esac
+
+	make -j1 modules_install firmware_install $_install \
+		INSTALL_MOD_PATH="$_outdir" \
+		INSTALL_PATH="$_outdir"/boot \
+		|| return 1
+
+	rm -f "$_outdir"/lib/modules/${_abi_release}/build \
+		"$_outdir"/lib/modules/${_abi_release}/source
+	rm -rf "$_outdir"/lib/firmware
 
 	install -D include/config/kernel.release \
-		"$pkgdir"/usr/share/kernel/$_buildflavor/kernel.release
+		"$_outdir"/usr/share/kernel/$_buildflavor/kernel.release
 }
 
-dev() {
-	local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
+# main flavor installs in $pkgdir
+package() {
+	depends="$depends linux-firmware"
+
+	_package $_mainflavor "$pkgdir"
+}
+
+# subflavors install in $subpkgdir
+virthardened() {
+	_package virthardened "$subpkgdir"
+}
+
+_dev() {
+	local _flavor=$(echo $subpkgname | sed -E 's/(^linux-|-dev$)//g')
+	local _abi_release=${pkgver}-${pkgrel}-$_flavor
 	# copy the only the parts that we really need for build 3rd party
 	# kernel modules and install those as /usr/src/linux-headers,
 	# simlar to what ubuntu does
@@ -110,15 +154,15 @@ dev() {
 	# this way you dont need to install the 300-400 kernel sources to
 	# build a tiny kernel module
 	#
-	pkgdesc="Headers and script for third party modules for $_buildflavor kernel"
+	pkgdesc="Headers and script for third party modules for $_flavor kernel"
 	depends="gmp-dev bash"
 	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
 
 	# first we import config, run prepare to set up for building
 	# external modules, and create the scripts
 	mkdir -p "$dir"
-	cp "$srcdir"/config-$_buildflavor.${CARCH} "$dir"/.config
-	echo "-$pkgrel-$_buildflavor" > "$dir"/localversion-alpine \
+	cp "$srcdir"/config-$_flavor.${CARCH} "$dir"/.config
+	echo "-$pkgrel-$_flavor" > "$dir"/localversion-alpine \
 		|| return 1
 	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" HOSTCC="${CC:-gcc}" \
 		silentoldconfig prepare modules_prepare scripts
@@ -132,24 +176,36 @@ dev() {
 	# this is taken from ubuntu kernel build script
 	# http://kernel.ubuntu.com/git/ubuntu/ubuntu-zesty.git/tree/debian/rules.d/3-binary-indep.mk
 	cd "$srcdir"/linux-$_kernver
-	find . -path './include/*' -prune \
-		   -o -path './scripts/*' -prune -o -type f \
-		   \( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
-			 -name '*.sh' -o -name '*.pl' -o -name '*.lds' \) \
-		   -print | cpio -pdm "$dir" || return 1
+	find .  -path './include/*' -prune \
+		-o -path './scripts/*' -prune -o -type f \
+		\( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
+		   -name '*.sh' -o -name '*.pl' -o -name '*.lds' \) \
+		-print | cpio -pdm "$dir" || return 1
+
 	cp -a scripts include "$dir" || return 1
 	find $(find arch -name include -type d -print) -type f \
 		| cpio -pdm "$dir"
 
-	install -Dm644 "$builddir"/Module.symvers "$dir"/Module.symvers
+	install -Dm644 "$srcdir"/build-$_flavor/Module.symvers \
+		"$dir"/Module.symvers
 
 	mkdir -p "$subpkgdir"/lib/modules/${_abi_release}
 	ln -sf /usr/src/linux-headers-${_abi_release} \
 		"$subpkgdir"/lib/modules/${_abi_release}/build
+}
 
+menuconfig() {
+	cd "$srcdir"/linux-$_kernver
+	for i in $_flavors; do
+		local _config=config-$i.${CARCH}
+    cp "$startdir"/$_config .config
+	  make ARCH="${CARCH}" menuconfig
+	  cp .config "$startdir"/$_config
+  done
 }
 
 sha512sums="bf67ff812cc3cb7e5059e82cc5db0d9a7c5637f7ed9a42e4730c715bf7047c81ed3a571225f92a33ef0b6d65f35595bc32d773356646df2627da55e9bc7f1f1a  linux-4.9.tar.xz
-752b09fc50f1f91bbf0b1ea7c49b7cc2bb601103c90de80086dde0e3baa745ebcdb0d953ac49c3db5d8dcd95cfdc45e09d29e7304f1baf2666889464fd70a39b  patch-4.9.50.xz
-205a75130683365a75e9f58c01c99ff251076f3006fe582883efc1f29a5207c8da61e4261ce8f19de222ec310fd2404123b29d51edcbd235d30b30637efbcf0e  hardened-3.1-4.9.50-201704252333-alpine.patch
-1dca7b9dce43caf176530b7b49af67b43a203396f4a78ccfad24ff1b86d6fc49e9631f374748e9612cd84d3ac1b785e8c0c4cc3983eb30a147f45e562d08e07e  config-t430.x86_64"
+ae0149e43bcbdd496ce304ae6db84dd6d2f7315a84ef6b7d9b2f292f8b7ac8fe9f2a8406655402e832f0ad85828dfe635ac6207333530a95265c281faa6a973d  patch-4.9.73.xz
+91d6455d077e9a1b4c5bb704989e3740e434b78e5c40c371ea54ca877593a7deea848b7a9fb4c03b53a04b61f2389947772fe7c3ae85c772ba096d1d2887de6f  hardened-3.1-4.9.73-201704252333-alpine2.patch
+5a0a78e6de11eb8180d96830b9faa9ac560586f7beb663c8196a16ac6232b5008b9181b3c9b94e2b13a444acba4b6e80a3408d34606432f92eb4d169c3953d5d  zfs-fix.patch
+fdf7684a83c90e95f580758c26742039aee2accbbeba0da283a64c9d1a0f49e0ffdd39d24ac643dc6a1a67f62a0a58a7e79cb42bacaa632c4c114f7fb97f02db  config-t430.x86_64"

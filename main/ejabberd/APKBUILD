@@ -1,0 +1,73 @@
+# Contributor: Leonardo Arena <rnarld@alpinelinux.org>
+# Contributor: Francesco Colista <fcolista@alpinelinux.org>
+# Maintainer: John Regan <john@jrjrtech.com>
+pkgname=ejabberd
+pkgver=18.03
+pkgrel=0
+pkgdesc="An erlang jabber server"
+url="http://www.ejabberd.im"
+arch="all"
+license="GPL2+"
+_erl_deps="erlang-asn1 erlang-crypto erlang-eldap erlang-mnesia
+	erlang-public-key erlang-sasl erlang-ssl erlang-syntax-tools erlang-os-mon
+	"
+_erl_make_deps="erlang-eunit erlang-parsetools"
+depends="erlang util-linux yaml $_erl_deps"
+depends_dev="erlang-dev expat-dev libressl-dev zlib-dev heimdal-dev yaml-dev git"
+makedepends="$depends_dev $_erl_deps $_erl_make_deps automake autoconf"
+pkgusers="ejabberd"
+pkggroups="ejabberd"
+install="$pkgname.pre-install"
+subpackages="$pkgname-dev $pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::https://github.com/processone/$pkgname/archive/$pkgver.tar.gz
+	fast_tls-1.0.21.tar.gz::https://github.com/processone/fast_tls/archive/1.0.21.tar.gz
+	p1_utils-1.0.11.tar.gz::https://github.com/processone/p1_utils/archive/1.0.11.tar.gz
+	ejabberd.initd
+	ejabberd.logrotate
+	ejabberd.confd
+	"
+
+builddir="$srcdir"/$pkgname-$pkgver
+
+prepare() {
+	cd "$builddir"
+	mkdir deps
+	mv "$srcdir"/fast_tls-1.0.21 "$builddir"/deps/fast_tls
+	mv "$srcdir"/p1_utils-1.0.11 "$builddir"/deps/p1_utils
+	default_prepare
+}
+
+build() {
+	cd "$builddir"
+	./autogen.sh
+	./configure --prefix=/usr \
+		--sysconfdir=/etc \
+		--localstatedir=/var \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info
+	make
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install || return 1
+
+	install -d ${pkgdir}/var/spool/$pkgname
+	install -d ${pkgdir}/var/lib/$pkgname
+	install -D -m0644 "$srcdir"/$pkgname.logrotate \
+		${pkgdir}/etc/logrotate.d/$pkgname
+	install -m755 -D "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+	chown -R ejabberd.ejabberd "$pkgdir"/var/log/ejabberd
+	chown -R ejabberd.ejabberd "$pkgdir"/var/spool/ejabberd
+	chown -R ejabberd.ejabberd "$pkgdir"/var/lib/ejabberd
+	chgrp ejabberd "$pkgdir"/etc/ejabberd/ejabberd.yml \
+		"$pkgdir"/etc/ejabberd/ejabberdctl.cfg "$pkgdir"/etc/ejabberd
+}
+
+sha512sums="47e61239d3ee6f04c381c2000ff4dca52fb728488f8c060eeb5a0253de3d42fe6c9ab730cca63aab6a02d32dfe2bdec2e202272fd1e8e386eb334c1e82ccb9ff  ejabberd-18.03.tar.gz
+aea0cd9af3ecce710383242c18b239131f732e211230ad19462c3b305318d7a4559e4df4e201fba012c9c1a6a7de1a6463f917a7b3917ac9e4d606b32564b93a  fast_tls-1.0.21.tar.gz
+a61ffa68c6ded3f3ff2c1c580553d853016935d937e4c30f2523cc99dd8bc814e0d9afa86d20c3a70c03a81c2bf10f3834464be589f1f5c3638a353b80a8a872  p1_utils-1.0.11.tar.gz
+e2310e1b5b471e5c27ce2ec5d5fc6549656f9f49ba1d65a515ebc3af6d3237a461894c6c4c55c8c6eb1b9be0b01573057591ead51eb9014f5cf1258d387c9fc8  ejabberd.initd
+47fd2cfd9177c4e978a9799a153ba74392a9891822221af8194686a40f6bf01f38644833e1e1f5416c6357e0bfb7ca3dae96f55a4fcd7cd629ec798d85a72807  ejabberd.logrotate
+96a571c0ab2be366e931bda423a61ef920cbaba2107e61ddbc501472ce3efe2804418cc6579c99310b902a9a99aaecb9284cf2420c071dbca2f670efb4034135  ejabberd.confd"

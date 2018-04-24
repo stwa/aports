@@ -1,0 +1,26 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=htmldoc
+pkgver=1.9.3
+pkgrel=0
+pkgdesc="Produce PDF or Postscript from HTML documents including TOCs and Indices"
+url="https://www.msweet.org/projects.php?Z1"
+arch="all"
+license="GPL2"
+makedepends="libxpm-dev libjpeg-turbo-dev"
+subpackages="$pkgname-doc"
+source="https://github.com/michaelrsweet/$pkgname/releases/download/v$pkgver/$pkgname-$pkgver-source.tar.gz"
+builddir="$srcdir"
+
+build() {
+	cd "$builddir"
+	./configure --prefix=$pkgdir/usr
+	make
+}
+
+package() {
+	cd "$builddir"
+	make install
+}
+
+sha512sums="c396a1c702023d2f1904359a16183fd1860ff549e17f6a4dcb7f3f211edf0a574d1f580edbaccf91b23b0c2f4ba1e75ab3cdae124da68cbe7adfc702fc9928d1  htmldoc-1.9.3-source.tar.gz"

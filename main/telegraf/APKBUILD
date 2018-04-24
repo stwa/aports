@@ -1,0 +1,56 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=telegraf
+pkgver=1.6.1
+pkgrel=0
+pkgdesc="The plugin-driven server agent for collecting & reporting metrics"
+url="https://www.influxdata.com/time-series-platform/telegraf/"
+arch="all"
+license="MIT"
+makedepends="go asciidoc xmlto"
+pkgusers="telegraf"
+pkggroups="telegraf"
+install="$pkgname.pre-install"
+source="$pkgname-$pkgver.tar.gz::https://github.com/influxdata/$pkgname/archive/$pkgver.tar.gz
+	telegraf.initd
+	"
+builddir="$srcdir/src/github.com/influxdata/$pkgname"
+
+prepare() {
+     mkdir -p ${builddir%/*}
+     mv "$srcdir"/$pkgname-$pkgver "$builddir"/
+     export GOPATH="$srcdir"
+     cd "$builddir"
+	 go get github.com/sparrc/gdm
+     "$GOPATH"/bin/gdm restore
+     default_prepare
+}
+
+build() {
+	export GOPATH="$srcdir"
+	cd "$builddir"
+	local path
+	for path in $(find ./cmd/* -maxdepth 0 -type d); do
+		go build -v -work -x -ldflags="-X main.version=$pkgver" \
+			-o ./bin/${path##*/} $path
+	done
+}
+
+package() {
+	cd "$builddir"
+	local path
+	for path in $(find ./cmd/* -maxdepth 0 -type d); do
+		install -Dm755 ./bin/"${path##*/}" "$pkgdir"/usr/sbin/"${path##*/}"
+	done
+
+	install -Dm644 "etc/telegraf.conf" \
+		"$pkgdir/etc/telegraf/telegraf.conf"
+	install -Dm644 "etc/logrotate.d/$pkgname" \
+		"$pkgdir/etc/logrotate.d/$pkgname"
+
+	install -Dm755 "$srcdir/$pkgname.initd" \
+		"$pkgdir/etc/init.d/$pkgname"
+}
+
+sha512sums="21ee24ee4a4806bda5625d715da211f40809ea0dd16f2577b1712be87988c584cf5083293ab5c1d1ffe39108364d38b7384679ca88d01d1cefee94a96a3de613  telegraf-1.6.1.tar.gz
+0f7c75306cc623e9108b1f1327acb7e94651800b9bd7eac83a9d96637d9ec6122abb17ebe196990a771a5378c0342abc72a653b8bc5d5ae5f969a64fa28e472e  telegraf.initd"

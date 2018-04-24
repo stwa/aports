@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+
+pidfile=/run/telegraf.pid
+start_stop_daemon_args="--user telegraf --stderr /var/log/telegraf/telegraf.log"
+command=/usr/sbin/telegraf
+command_args="${EXTRA_OPTS}"
+command_background="yes"
+
+depend() {
+	need net
+	after firewall
+}
+
+start_pre() {
+	checkpath -d -o telegraf:telegraf -m755 /var/lib/telegraf /var/log/telegraf
+}

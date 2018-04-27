@@ -3,20 +3,21 @@
 pkgname=opendkim-unbound
 _pkgname=opendkim
 pkgver=2.10.3
-pkgrel=1
+pkgrel=2
 pkgdesc="DKIM signing and verifying filter for MTAs"
 url="http://www.opendkim.org"
 arch="all"
 license="custom"
 provides="opendkim"
-makedepends="$depends_dev libressl-dev libmilter-dev unbound-dev"
+makedepends="libressl-dev libmilter-dev unbound-dev ldns-dev"
 pkgusers=opendkim
 pkggroups=opendkim
 subpackages="$pkgname-dev $pkgname-doc $pkgname-libs $pkgname-dbg"
 install="$pkgname.pre-install"
 source="http://downloads.sourceforge.net/project/$_pkgname/$_pkgname-$pkgver.tar.gz
-  opendkim.conf
-  opendkim.initd"
+	opendkim.conf
+	opendkim.initd
+	"
 
 builddir="$srcdir"/$_pkgname-$pkgver
 
@@ -27,9 +28,8 @@ build() {
 		--host=$CHOST \
 		--prefix=/usr \
 		--with-unbound \
-		--with-ldns \
-		|| return 1
-	make || return 1
+		--with-ldns
+	make
 }
 
 package() {

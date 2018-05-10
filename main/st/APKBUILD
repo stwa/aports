@@ -2,7 +2,7 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 pkgname=st
 pkgver=0.8.1
-pkgrel=0
+pkgrel=1
 pkgdesc="a simple terminal implementation for X"
 url="http://st.suckless.org/"
 arch="all"
@@ -46,4 +46,4 @@ EOF
 
 sha512sums="787d35b0cc8b1435dad7809e9995bed3c7f781e012a4a43dd5ae3d670ebc0e4bc03a56ba3872ff8a3bdba316a41ba771c626adc8de0559296457a59170756c6b  st-0.8.1.tar.gz
 3bf1f79273d490b22d4c45130aaf2a194b49da71656740bb8f69d45cfd9692de0b9eaccce4242004c823dc59289ca4ddf47ccd75ee50b4d3e3809e4ed6deee8b  st-scrollback.patch
-89aa19c62ae323033ff9f096e80301233ed956d3744f22437c9b3d44d6318ad4778eac9f0b5018bee3fee402487d6b7b433d62787fa6ef7f1eac9699c9326174  config.h"
+d5c01c5527a6f0c119120c9c16def7669d18008ae98d80ba7a73d5d72b9ce681329c51d005aac9a6894669e48e1dbc521c06ab63c3e9dad6c02dcf9d5f817aee  config.h"

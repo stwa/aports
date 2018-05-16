@@ -1,0 +1,46 @@
+#!/sbin/openrc-run
+
+description="Rapid spam filtering system"
+
+: ${user:=${RSPAMD_USER:-rspamd}}
+: ${group:=${RSPAMD_GROUP:-rspamd}}
+: ${cfgdir:=${RSPAMD_CONFDIR:-/etc/rspamd}}
+: ${cfgfile:=${RSPAMD_CONFIG:-$cfgdir/rspamd.conf}}
+: ${pidfile:=${RSPAMD_PIDFILE:-/run/$RC_SVCNAME/rspamd.pid}}
+
+command=/usr/sbin/rspamd
+command_args="-u $user -g $group -c $cfgfile -p $pidfile"
+required_files="$cfgfile"
+extra_commands="checkconfig"
+extra_started_commands="reload reopen"
+description_checkconfig="Verify configuration"
+description_reload="Reload configuration"
+description_reopen="Reopen log files"
+
+depend() {
+	need localmount net
+	before mta
+}
+
+checkconfig() {
+	ebegin "Checking $RC_SVCNAME config"
+	$command $command_args -t
+	eend $?
+}
+
+start_pre() {
+	checkpath -d -m 750 -o $user:$group ${pidfile%/*}
+	checkconfig >/dev/null 2>>${startuplog:=${RSPAMD_STARTUPLOG:-/dev/null}}
+}
+
+reload() {
+	ebegin "Reloading $RC_SVCNAME config"
+	checkconfig >/dev/null 2>&1 && start-stop-daemon --signal HUP --pidfile $pidfile
+	eend $?
+}
+
+reopen() {
+	ebegin "Reopening $RC_SVCNAME log files"
+	start-stop-daemon --signal USR1 --pidfile $pidfile
+	eend $?
+}

@@ -1,13 +1,13 @@
 # Contributor: Stefan Wagner <stw@bit-strickerei.de>
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=cert-strickerei
-pkgver=0.3
+pkgver=0.4
 pkgrel=0
 pkgdesc="Easily manage your letsencrypt certificates"
 url="https://bit-strickerei.de"
 arch="all"
 license="GPL"
-depends="libressl sudo python2"
+depends="libressl sudo acme.sh"
 source="cert-strickerei.sh"
 builddir="$srcdir/"
 
@@ -17,4 +17,4 @@ package() {
 	install -Dm755 "$srcdir/cert-strickerei.sh" "$pkgdir/usr/bin/cert-strickerei"
 }
 
-sha512sums="85ba9742ef926574bd144304f1e0f2f12bd482ed3ab150e80b0628404cc7ff3e4a14cd5d15e0a812fc8e932d963343c12311f3d588769db4553f4f46b75503a4  cert-strickerei.sh"
+sha512sums="0aa50f264cf244ed431aaf5d37d1b8e9c468fac60c2778f4504be06d5a0092520502d6e2d28824a38f3572842f291dde9df84521c983cb31c30b0d68c7bbc7f7  cert-strickerei.sh"

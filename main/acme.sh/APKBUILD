@@ -1,0 +1,28 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=acme.sh
+pkgver=2.7.8
+pkgrel=0
+pkgdesc="A pure Unix shell script implementing ACME client protocol"
+url="https://acme.sh/"
+arch="all"
+license="GPLv3"
+depends=""
+makedepends=""
+install=""
+source="$pkgname-$pkgver.tar.gz::https://github.com/Neilpang/$pkgname/archive/$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+
+	install -d "$pkgdir"/usr/bin
+	install -Dm755 "$pkgname" "$pkgdir"/usr/bin/"$pkgname"
+
+}
+
+sha512sums="08063f38639c468b320ac638215975d778dfd62a9c285f211049faa44be41e21ffa190d2bf5b84a6cd555f5b14fae623299ab6b5060f65be5eb058387f6afce9  acme.sh-2.7.8.tar.gz"

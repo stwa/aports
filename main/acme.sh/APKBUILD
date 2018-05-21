@@ -2,12 +2,12 @@
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=acme.sh
 pkgver=2.7.8
-pkgrel=1
+pkgrel=2
 pkgdesc="A pure Unix shell script implementing ACME client protocol"
 url="https://acme.sh/"
 arch="all"
 license="GPLv3"
-depends=""
+depends="openssl sed wget"
 makedepends=""
 pkgusers="acmesh"
 pkggroups="acmesh"

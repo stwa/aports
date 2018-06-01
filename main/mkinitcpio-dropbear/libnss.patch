@@ -1,0 +1,11 @@
+diff -ur a/dropbear_install b/dropbear_install
+--- a/dropbear_install	2018-06-01 13:33:24.457121175 +0200
++++ b/dropbear_install	2018-06-01 13:33:36.000505503 +0200
+@@ -87,7 +87,6 @@
+   cat /etc/dropbear/root_key > "${BUILDROOT}"/root/.ssh/authorized_keys
+ 
+   add_full_dir "/etc/dropbear"
+-  add_file "/lib/libnss_files.so.2"
+   add_dir "/var/run"
+   add_dir "/var/log"
+   touch "${BUILDROOT}"/var/log/lastlog

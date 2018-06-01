@@ -1,0 +1,27 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-dropbear
+pkgver=0.0.3
+pkgrel=0
+pkgdesc="mkinitcpio hook to install and enable the dropbear daemon in early userspace"
+url="https://github.com/grazzolini/mkinitcpio-dropbear"
+arch="noarch"
+license="GPL3"
+depends="mkinitcpio dropbear dropbear-convert"
+source="$pkgname-$pkgver.tar.gz::https://github.com/grazzolini/$pkgname/archive/v$pkgver.tar.gz
+	libnss.patch"
+options="!check"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+	install -Dm644 dropbear_hook "$pkgdir"/usr/lib/initcpio/hooks/dropbear
+	install -Dm644 dropbear_install "$pkgdir"/usr/lib/initcpio/install/dropbear
+}
+
+sha512sums="65d9d794411dc9da03d900655b748cdda72ad39f4b0188a25c1521ed656d9c92bbbf248b09e8eb7f345839001944fc56c10e1c1fe123a73732fea8ffb6fb78d4  mkinitcpio-dropbear-0.0.3.tar.gz
+d4ce606f88f44bab19dd16f5c30d80a0840b6d02de0ea70cebe9f4052cd280ef23378ddcafb6bc303263fe4bb6986cec976b5c8aa7d4dd0a9a79238f66ddda11  libnss.patch"

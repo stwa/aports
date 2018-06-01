@@ -1,0 +1,80 @@
+diff -ur a/Makefile b/Makefile
+--- a/Makefile	2018-06-02 23:59:28.190256685 +0200
++++ b/Makefile	2018-06-03 00:01:10.927738126 +0200
+@@ -88,7 +88,7 @@
+ mkinitcpio-$(VERSION).tar.gz:
+ 	echo $(VERSION) > VERSION
+ 	git archive --format=tar --prefix=mkinitcpio-$(VERSION)/ -o mkinitcpio-$(VERSION).tar HEAD
+-	bsdtar -rf mkinitcpio-$(VERSION).tar -s ,^,mkinitcpio-$(VERSION)/, $(MANPAGES) VERSION
++	tar -rf mkinitcpio-$(VERSION).tar -s ,^,mkinitcpio-$(VERSION)/, $(MANPAGES) VERSION
+ 	gzip -9 mkinitcpio-$(VERSION).tar
+ 	$(RM) VERSION
+ 
+diff -ur a/lsinitcpio b/lsinitcpio
+--- a/lsinitcpio	2018-06-02 23:59:28.190256685 +0200
++++ b/lsinitcpio	2018-06-03 00:01:38.465538113 +0200
+@@ -9,7 +9,7 @@
+ _optcolor=1
+ _f_functions=functions
+ 
+-declare -A bsdcpio_options=(
++declare -A cpio_options=(
+     [list]='--list'
+     [input]='-i'
+     [quiet]='--quiet'
+@@ -160,7 +160,7 @@
+     fi
+ 
+     # decompress the image since we need to read from it multiple times.
+-    decomp "$_image" | bsdtar -C "$workdir" -xf - || die 'Failed to decompress image'
++    decomp "$_image" | tar -C "$workdir" -xf - || die 'Failed to decompress image'
+ 
+     # collect stats
+     kernver=("$workdir"/usr/lib/modules/*/)
+@@ -271,10 +271,10 @@
+             exit 0
+             ;;
+         -v|--verbose)
+-            bsdcpio_options['verbose']='--verbose'
++            cpio_options['verbose']='--verbose'
+             ;;
+         -x|--extract)
+-            unset 'bsdcpio_options[list]'
++            unset 'cpio_options[list]'
+             ;;
+         --)
+             shift
+@@ -307,10 +307,10 @@
+ if (( _optanalyze )); then
+     analyze_image "$_image"
+ elif (( _optshowconfig )); then
+-    decomp "$_image" | bsdtar xOf - buildconfig 2>/dev/null ||
++    decomp "$_image" | tar xOf - buildconfig 2>/dev/null ||
+         die 'Failed to extract config from image (mkinitcpio too old?)'
+ else
+-    decomp "$_image" | bsdcpio "${bsdcpio_options[@]}"
++    decomp "$_image" | cpio "${cpio_options[@]}"
+ fi
+ 
+ # vim: set ft=sh ts=4 sw=4 et:
+diff -ur a/mkinitcpio b/mkinitcpio
+--- a/mkinitcpio	2018-06-02 23:59:28.190256685 +0200
++++ b/mkinitcpio	2018-06-03 00:02:15.764892094 +0200
+@@ -222,7 +222,7 @@
+ 
+     pushd "$BUILDROOT" >/dev/null
+     find -mindepth 1 -printf '%P\0' |
+-            LANG=C bsdcpio "${cpio_opts[@]}" |
++            LANG=C cpio "${cpio_opts[@]}" |
+             $compress "${COMPRESSION_OPTIONS[@]}" > "$out"
+     pipesave=("${PIPESTATUS[@]}") # save immediately
+     popd >/dev/null
+@@ -230,7 +230,7 @@
+     if (( pipesave[0] )); then
+         errmsg="find reported an error"
+     elif (( pipesave[1] )); then
+-        errmsg="bsdcpio reported an error"
++        errmsg="cpio reported an error"
+     elif (( pipesave[2] )); then
+         errmsg="$compress reported an error"
+     fi

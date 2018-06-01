@@ -1,0 +1,24 @@
+diff -ur a/install/base b/install/base
+--- a/install/base	2018-06-02 23:57:06.434786847 +0200
++++ b/install/base	2018-06-02 23:57:54.335752105 +0200
+@@ -3,16 +3,16 @@
+ build() {
+     local applet
+ 
+-    add_binary /usr/lib/initcpio/busybox /bin/busybox
++    add_binary busybox
+ 
+-    for applet in $(/usr/lib/initcpio/busybox --list); do
+-        add_symlink "/usr/bin/$applet" busybox
++    for applet in $(/bin/busybox --list); do
++        add_symlink "/bin/$applet" busybox
+     done
+ 
+     # add kmod with applet symlinks
+     add_binary kmod
+     for applet in {dep,ins,rm,ls}mod mod{probe,info}; do
+-        add_symlink "/usr/bin/$applet" kmod
++        add_symlink "/bin/$applet" kmod
+     done
+ 
+     add_binary blkid

@@ -1,0 +1,39 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio
+pkgver=24
+pkgrel=0
+pkgdesc="Modular initramfs image creation utility"
+url="https://projects.archlinux.org/mkinitcpio.git/"
+arch="noarch"
+license="GPL"
+depends="gawk bash coreutils util-linux kmod findutils grep ncurses"
+makedepends="asciidoc"
+provides="mkinitfs"
+triggers="$pkgname.trigger=/usr/share/kernel/*"
+subpackages="$pkgname-doc"
+source="https://sources.archlinux.org/other/$pkgname/$pkgname-$pkgver.tar.gz
+	ash-path.patch
+	busybox-path.patch
+	bsdtar-bsdcpio.patch
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+}
+
+check() {
+	cd "$builddir"
+	make check
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install
+}
+
+sha512sums="4ada6a5af6660525d54177af95fceb630fcd82340e6fe461387da6f9ff385e0239691107eafcdae1693b0531d7370841c527528d514498bb3c76c29acda1a133  mkinitcpio-24.tar.gz
+6cf4d8eb7b6222f837180ab2452e69d65dc31dc8359c680a9c59f661836a7221ab8a55cc88c959a0dd9e8708f05c778ff688de2c119158e84babf55abab1b088  ash-path.patch
+5bda9c38643e4e5ad47c1e95eed40899c83126cd2cc6ed0648911de626a683921cc59accfa3ceb745a60059a8c94a320b555f9bbb83ecca306bfd81d57a0e011  busybox-path.patch
+35c402540c4de8462e00b8be2f36039119aa1b731f7575b169b08d8a0b77143f1c1fbb7cb78b79f01dbee3a8d041c49982f2ee7c6d80bc90e0b624f787a975f6  bsdtar-bsdcpio.patch"

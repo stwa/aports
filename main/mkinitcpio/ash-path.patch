@@ -1,0 +1,18 @@
+diff -ur a/init b/init
+--- a/init	2017-10-01 20:21:09.000000000 +0200
++++ b/init	2018-06-02 23:55:24.720770097 +0200
+@@ -1,4 +1,4 @@
+-#!/usr/bin/ash
++#!/bin/ash
+ 
+ udevd_running=0
+ mount_handler=default_mount_handler
+diff -ur a/test/test_parse_cmdline b/test/test_parse_cmdline
+--- a/test/test_parse_cmdline	2017-10-01 20:21:09.000000000 +0200
++++ b/test/test_parse_cmdline	2018-06-02 23:56:00.996186087 +0200
+@@ -1,4 +1,4 @@
+-#!/lib/initcpio/busybox ash
++#!/bin/ash
+ 
+ . ./init_functions
+ 

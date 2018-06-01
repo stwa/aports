@@ -1,0 +1,35 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-nfs-utils
+pkgver=0.3
+pkgrel=0
+pkgdesc="ipconfig and nfsmount tools for NFS root support in mkinitcpio"
+url="https://projects.archlinux.org/mkinitcpio.git/"
+arch="all"
+license="GPL"
+depends="mkinitcpio"
+makedepends="linux-headers"
+source="$pkgname-$pkgver.tar.gz::https://sources.archlinux.org/other/mkinitcpio/$pkgname-$pkgver.tar.xz
+	sys-nmln.patch
+	net_hook
+	net_install"
+options="!check"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	make PROGRAMS=ipconfig
+}
+
+package() {
+	cd "$builddir"
+	make PROGRAMS=ipconfig DESTDIR="$pkgdir" install
+
+	install -Dm644 "$srcdir"/net_hook "$pkgdir"/usr/lib/initcpio/hooks/net
+	install -Dm644 "$srcdir"/net_install "$pkgdir"/usr/lib/initcpio/install/net
+}
+
+sha512sums="f867c1ee7dc193c666fe2147c4a168bd1bed4d2547cd00f32e4a119e18656f0bc20fe76798cbe4a4270e8292820d45528113f8bba392a42df25c26909c353b43  mkinitcpio-nfs-utils-0.3.tar.gz
+5eccd0e2b76ed3b1cc8298764521f2ec83731378c8e1a884324b3a725c0dfe7ee745c2c5607972b0477bc4974694cbbe74d35f9e7c156f686a659b2aaaa49f6c  sys-nmln.patch
+ab776d79f7955e2a6d177f8e2cce870536c0d90ab500d1476c22571fdd8705012208a5e002f7db8ff74b6f9c13fe80c73e3dd83e260e38592670d8a33bae5114  net_hook
+455822c52e3428db2afb88a0b8031e8ce65bae70c1f7c885f513400f64cb058608ff03341c9dfe8ad5f29449c100565a4297e59832cc2910dac7c3fcc32fc1f9  net_install"

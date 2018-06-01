@@ -1,0 +1,25 @@
+diff -ur a/ipconfig/netdev.h b/ipconfig/netdev.h
+--- a/ipconfig/netdev.h	2018-05-31 01:21:50.519722414 +0200
++++ b/ipconfig/netdev.h	2018-05-31 01:22:14.337110601 +0200
+@@ -3,6 +3,10 @@
+ 
+ #include <sys/utsname.h>
+ 
++#ifndef SYS_NMLN
++#define SYS_NMLN	256
++#endif
++
+ #define BPLEN		256
+ #define FNLEN		128			/* from DHCP  RFC 2131 */
+ 
+diff -ur a/ipconfig/packet.c b/ipconfig/packet.c
+--- a/ipconfig/packet.c	2018-05-31 01:21:50.519722414 +0200
++++ b/ipconfig/packet.c	2018-05-31 01:24:43.898315592 +0200
+@@ -7,7 +7,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+-#include <net/if_packet.h>
+ #include <netinet/if_ether.h>
+ #include <netinet/in.h>
+ #include <netpacket/packet.h>

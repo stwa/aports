@@ -1,0 +1,29 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-utils
+pkgver=0.0.3
+pkgrel=0
+pkgdesc="Collection of mkinitcpio utilities performing various tasks"
+url="https://github.com/grazzolini/mkinitcpio-utils"
+arch="noarch"
+license="BSD"
+depends="mkinitcpio"
+source="$pkgname-$pkgver.tar.gz::https://github.com/grazzolini/mkinitcpio-utils/archive/v$pkgver.tar.gz
+	udev.patch"
+options="!check"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+	install -Dm644 README.md "$pkgdir"/usr/share/$pkgname/README.md
+	install -Dm755 utils/shells/cryptsetup_shell "$pkgdir"/usr/share/$pkgname/utils/shells/cryptsetup_shell
+	install -Dm644 initcpio/hooks/encryptssh "$pkgdir"/usr/lib/initcpio/hooks/encryptssh
+	install -Dm644 initcpio/install/encryptssh "$pkgdir"/usr/lib/initcpio/install/encryptssh
+}
+
+sha512sums="9d454006978f23abca61be71523454670b94ea6d8e08eeab2e61fc81da3e3f5e8ec2b053fb0a6f986ce673d8521aa2a5b5fe5f37d4dffc4e27fde1b238437470  mkinitcpio-utils-0.0.3.tar.gz
+af2b0bbe6e28146394c2a92ef05f59aa126458775b7b645e3bacfedda15cfd33767e6160c97cb877a111448525e3d314e3d9fa97c0f0f3b8acd11841cb9bd66e  udev.patch"

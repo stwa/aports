@@ -1,0 +1,15 @@
+diff -ur a/initcpio/install/encryptssh b/initcpio/install/encryptssh
+--- a/initcpio/install/encryptssh	2016-09-13 14:37:52.000000000 +0200
++++ b/initcpio/install/encryptssh	2018-06-01 13:46:30.584517553 +0200
+@@ -18,11 +18,6 @@
+     fi
+ 
+     add_binary "cryptsetup"
+-    add_binary "dmsetup"
+-    add_file "/usr/lib/udev/rules.d/10-dm.rules"
+-    add_file "/usr/lib/udev/rules.d/13-dm-disk.rules"
+-    add_file "/usr/lib/udev/rules.d/95-dm-notify.rules"
+-    add_file "/usr/lib/initcpio/udev/11-dm-initramfs.rules" "/usr/lib/udev/rules.d/11-dm-initramfs.rules"
+ 
+     add_binary "/usr/share/mkinitcpio-utils/utils/shells/cryptsetup_shell" "/bin/cryptsetup_shell"
+ 

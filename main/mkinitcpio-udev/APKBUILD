@@ -1,0 +1,27 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-udev
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="mkinitcpio hook to install and enable udev in early userspace"
+url="https://bit-strickerei.de"
+arch="noarch"
+license="GPL"
+depends="mkinitcpio eudev"
+source="udev_hook udev_install"
+options="!check"
+builddir="$srcdir"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+
+	install -Dm644 udev_hook "$pkgdir"/usr/lib/initcpio/hooks/udev
+	install -Dm644 udev_install "$pkgdir"/usr/lib/initcpio/install/udev
+}
+
+sha512sums="5e20f3e9aef2f9c5207cee1e38a153af5b2276316040dc12029ab5ec34bdb245755101f25a653f1681dc037e09987350b2b65e24f454e6c010b322c0a297ad78  udev_hook
+e8537c28ebb4b3fc7a737ad73e63f14302fdbe7a6dd9d33d716c16f615cc43d5af8964f16e19f70ebc5fa47d88e25234c3e0662043a75138bff468be18787ea3  udev_install"

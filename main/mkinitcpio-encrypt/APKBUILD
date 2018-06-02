@@ -1,0 +1,27 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-encrypt
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="mkinitcpio hook to install and enable cryptsetup in early userspace"
+url="https://bit-strickerei.de"
+arch="noarch"
+license="GPL"
+depends="mkinitcpio cryptsetup"
+source="encrypt_hook encrypt_install"
+options="!check"
+builddir="$srcdir"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+
+	install -Dm644 encrypt_hook "$pkgdir"/usr/lib/initcpio/hooks/encrypt
+	install -Dm644 encrypt_install "$pkgdir"/usr/lib/initcpio/install/encrypt
+}
+
+sha512sums="dab61d2559e16f4b74eb366ee5f41e82799d1bf6312fcb3b20f2750ad91c2ba9f3db43242aed00bb8ca9e34c18e48be2045e64ba68289d5720d78a03303b8161  encrypt_hook
+10a7d58418f59afe40f4b71201c69ef8b8ab692b6aa713030da3fe203527e3f33eac4d7b4066284c9e5d32047ec53576d71a6bce029cfce8f75202892ba27453  encrypt_install"

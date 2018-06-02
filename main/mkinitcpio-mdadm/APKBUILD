@@ -1,0 +1,27 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-mdadm
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="mkinitcpio hook to install and enable mdadm in early userspace"
+url="https://bit-strickerei.de"
+arch="noarch"
+license="GPL"
+depends="mkinitcpio mdadm"
+source="mdadm_hook mdadm_install"
+options="!check"
+builddir="$srcdir"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+
+	install -Dm644 mdadm_hook "$pkgdir"/usr/lib/initcpio/hooks/mdadm
+	install -Dm644 mdadm_install "$pkgdir"/usr/lib/initcpio/install/mdadm
+}
+
+sha512sums="199d92e204c9679f0e7929594a2994cafc1f405ece36e8674d07c26529901cfa7731027ebe7060922c5ce86d899aac6a1d7bc3f3b1fede7eb2a034df00167fbd  mdadm_hook
+512b2f2fb6898db3d2d2e12079d708e866c0051662a2a00707b7585aa3b64f1f00d98d4686c216c1d3348e1a2e3a0e880d23920369ee675c63b778acba1b410c  mdadm_install"

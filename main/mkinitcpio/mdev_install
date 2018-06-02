@@ -1,0 +1,21 @@
+#!/bin/bash
+
+build() {
+    add_file "/etc/mdev.conf"
+
+    for tool in /lib/mdev/*; do
+        add_file "$tool"
+    done
+
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+This hook will use mdev to create your root device node and detect the needed
+modules for your root device. It is also required for firmware loading in
+initramfs. It is recommended to use this hook.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

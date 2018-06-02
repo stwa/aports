@@ -1,0 +1,13 @@
+#!/usr/bin/ash
+
+run_earlyhook() {
+    echo /sbin/mdev > /proc/sys/kernel/hotplug
+    mdev -s
+}
+
+run_hook() {
+    grep -h MODALIAS /sys/bus/*/devices/*/uevent 2>/dev/null | \
+        cut -d= -f2 | xargs modprobe -abq
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

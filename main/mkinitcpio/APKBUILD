@@ -2,7 +2,7 @@
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=mkinitcpio
 pkgver=24
-pkgrel=1
+pkgrel=2
 pkgdesc="Modular initramfs image creation utility"
 url="https://projects.archlinux.org/mkinitcpio.git/"
 arch="noarch"
@@ -16,8 +16,11 @@ source="https://sources.archlinux.org/other/$pkgname/$pkgname-$pkgver.tar.gz
 	ash-path.patch
 	busybox-path.patch
 	bsdtar-bsdcpio.patch
+	add-user-group.patch
 	keymap_hook
 	keymap_install
+	mdev_hook
+	mdev_install
 	"
 builddir="$srcdir/$pkgname-$pkgver"
 
@@ -33,7 +36,7 @@ check() {
 package() {
 	cd "$builddir"
 	make DESTDIR="$pkgdir" install
-	for i in keymap; do
+	for i in keymap mdev; do
 		install -Dm644 "$srcdir"/"$i"_hook "$pkgdir"/usr/lib/initcpio/hooks/"$i"
 		install -Dm644 "$srcdir"/"$i"_install "$pkgdir"/usr/lib/initcpio/install/"$i"
 	done
@@ -43,5 +46,8 @@ sha512sums="4ada6a5af6660525d54177af95fceb630fcd82340e6fe461387da6f9ff385e023969
 6cf4d8eb7b6222f837180ab2452e69d65dc31dc8359c680a9c59f661836a7221ab8a55cc88c959a0dd9e8708f05c778ff688de2c119158e84babf55abab1b088  ash-path.patch
 5bda9c38643e4e5ad47c1e95eed40899c83126cd2cc6ed0648911de626a683921cc59accfa3ceb745a60059a8c94a320b555f9bbb83ecca306bfd81d57a0e011  busybox-path.patch
 35c402540c4de8462e00b8be2f36039119aa1b731f7575b169b08d8a0b77143f1c1fbb7cb78b79f01dbee3a8d041c49982f2ee7c6d80bc90e0b624f787a975f6  bsdtar-bsdcpio.patch
+fc72866f104f21be319ad5d31e717b24c66f4a2362f146d9c3c92466a37c376da6b46dd9116966118543ca4d874a1c216c82e44ed81524364a58e5a362692bc4  add-user-group.patch
 f770215aa09fc4ea9130b81b58b369edfbc6d7af2070752ff09a88e033b43a33664c848011dcd67d64e395c1d9a927486ae2c4d9e1d3d313d27a9e66f69bf593  keymap_hook
-393735e5532940c4b0e691088caed05fd08691871b61cc6aacd05b257ba7c993a5ee8d0bd302352cff601de98e749569ff82b87dc7ff75285cf4528d1da35c8f  keymap_install"
+393735e5532940c4b0e691088caed05fd08691871b61cc6aacd05b257ba7c993a5ee8d0bd302352cff601de98e749569ff82b87dc7ff75285cf4528d1da35c8f  keymap_install
+8fdcd38bf67ee74efb0725acb90325b5214a4d6115120c3be216d180c4f8e931844d82f94c05c1b97250be7e32cdc20be85f37f536c33d543ee5fba5a2ee0848  mdev_hook
+7121bc9b9737306cb6026e9b68d7e9ebfa7786b9c346ac5b968d6dc80572731bef6cdfacb20745f672c11050ebfae8e8f2ad57b35027f244c1ec931b21fc5fba  mdev_install"

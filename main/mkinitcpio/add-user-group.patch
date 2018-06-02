@@ -1,0 +1,13 @@
+diff -ur a/install/base b/install/base
+--- a/install/base	2018-06-03 00:04:58.322367278 +0200
++++ b/install/base	2018-06-03 00:14:14.339077102 +0200
+@@ -21,6 +21,9 @@
+ 
+     add_file "/usr/lib/initcpio/init_functions" "/init_functions"
+     add_file "/usr/lib/initcpio/init" "/init"
++
++    add_file "/etc/passwd"
++    add_file "/etc/group"
+ }
+ 
+ help() {

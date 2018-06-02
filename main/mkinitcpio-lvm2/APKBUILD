@@ -1,0 +1,27 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=mkinitcpio-lvm2
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="mkinitcpio hook to install and enable lvm2 in early userspace"
+url="https://bit-strickerei.de"
+arch="noarch"
+license="GPL"
+depends="mkinitcpio lvm2 device-mapper thin-provisioning-tools"
+source="lvm2_hook lvm2_install"
+options="!check"
+builddir="$srcdir"
+
+build() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+
+	install -Dm644 lvm2_hook "$pkgdir"/usr/lib/initcpio/hooks/lvm2
+	install -Dm644 lvm2_install "$pkgdir"/usr/lib/initcpio/install/lvm2
+}
+
+sha512sums="2db28952dd5234f7d6dbc07080935132f3769c870fe19989b1923b8a8902aee784d03e0a340a528e0410e9482aba1e79d4cb3ee4cdcc4a95348c1b36fafd6664  lvm2_hook
+898279bb2583b881ed10cfd41aee538e62aacd22977a122bcdcbdf0c86edb48d9b68d1843898a82b93d3941a81d822e1177d03aa6f97438391d816a0cb89b9ea  lvm2_install"

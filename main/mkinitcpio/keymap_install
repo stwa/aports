@@ -1,0 +1,14 @@
+#!/bin/bash
+
+build() {
+    add_full_dir /etc/keymap '*.bmap.gz'
+    add_runscript
+}
+
+help() {
+    cat <<HELPEOF
+This hook loads keymap(s) from /etc/keymap during early userspace.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

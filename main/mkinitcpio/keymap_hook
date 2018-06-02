@@ -1,0 +1,12 @@
+#!/usr/bin/ash
+
+run_hook() {
+    for map in etc/keymap/*; do
+        if [ -f "$map" ]; then
+            msg -n ":: Loading keymap ${map##*/}"
+            zcat "$map" | loadkmap
+        fi
+    done
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

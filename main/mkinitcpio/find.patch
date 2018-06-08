@@ -1,0 +1,12 @@
+diff -ur a/mkinitcpio b/mkinitcpio
+--- a/mkinitcpio	2018-06-09 00:49:03.102848237 +0200
++++ b/mkinitcpio	2018-06-09 00:49:20.798792520 +0200
+@@ -221,7 +221,7 @@
+     fi
+ 
+     pushd "$BUILDROOT" >/dev/null
+-    find -mindepth 1 -printf '%P\0' |
++    find -mindepth 1 -print0 |
+             LANG=C cpio "${cpio_opts[@]}" |
+             $compress "${COMPRESSION_OPTIONS[@]}" > "$out"
+     pipesave=("${PIPESTATUS[@]}") # save immediately

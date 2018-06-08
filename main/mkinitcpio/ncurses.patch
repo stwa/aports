@@ -1,0 +1,19 @@
+diff -ur a/lsinitcpio b/lsinitcpio
+--- a/lsinitcpio	2017-10-01 20:21:09.000000000 +0200
++++ b/lsinitcpio	2018-06-09 00:40:15.825581963 +0200
+@@ -142,13 +142,12 @@
+ 
+ analyze_image() {
+     local -a binaries explicitmod modules foundhooks hooks
+-    local kernver ratio columns=$(tput cols) image=$1
++    local kernver ratio columns image=$1
+ 
+     workdir=$(mktemp -d --tmpdir lsinitcpio.XXXXXX)
+     trap 'rm -rf "$workdir"' EXIT
+ 
+-    # fallback in case tput failed us
+-    columns=${columns:-80}
++    columns=80
+ 
+     zsize=$(stat -c %s "$_image")
+ 

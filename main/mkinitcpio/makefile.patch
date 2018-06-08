@@ -1,0 +1,13 @@
+diff -ur a/Makefile b/Makefile
+--- a/Makefile	2018-06-09 01:40:25.384536756 +0200
++++ b/Makefile	2018-06-09 01:43:33.791113881 +0200
+@@ -53,7 +53,8 @@
+ 	install -m644 -t $(DESTDIR)/usr/lib/initcpio init_functions functions
+ 	install -m644 udev/01-memdisk.rules $(DESTDIR)/usr/lib/initcpio/udev/01-memdisk.rules
+ 
+-	cp -at $(DESTDIR)/usr/lib/initcpio hooks install
++	install -m644 -t $(DESTDIR)/usr/lib/initcpio/hooks hooks/*
++	install -m644 -t $(DESTDIR)/usr/lib/initcpio/install install/*
+ 	install -m644 -t $(DESTDIR)/usr/share/mkinitcpio mkinitcpio.d/*
+ 	install -m644 systemd/mkinitcpio-generate-shutdown-ramfs.service \
+ 			$(DESTDIR)/usr/lib/systemd/system/mkinitcpio-generate-shutdown-ramfs.service

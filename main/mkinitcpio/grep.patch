@@ -1,0 +1,21 @@
+diff -ur a/functions b/functions
+--- a/functions	2018-06-09 01:16:26.211015438 +0200
++++ b/functions	2018-06-09 01:16:55.566926725 +0200
+@@ -290,7 +290,7 @@
+     done
+     shift $(( OPTIND - 1 ))
+ 
+-    while read -r -d '' mod; do
++    while read -r mod; do
+         (( ++count ))
+ 
+         for f in "${filter[@]}"; do
+@@ -300,7 +300,7 @@
+         mod=${mod##*/}
+         mod="${mod%.ko*}"
+         printf '%s\n' "${mod//-/_}"
+-    done < <(find "$_d_kmoduledir" -name '*.ko*' -print0 2>/dev/null | grep -EZz "$@")
++    done < <(find "$_d_kmoduledir" -name '*.ko*' -print 2>/dev/null | grep -E "$@")
+ 
+     (( count ))
+ }

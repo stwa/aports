@@ -1,3 +1,4 @@
-http://dl-cdn.alpinelinux.org/alpine/v3.7/main
-http://dl-cdn.alpinelinux.org/alpine/v3.7/community
-https://alpine.bit-strickerei.de/packages/v3.7/main
+https://alpine.bit-strickerei.de/packages/v3.8/main
+https://alpine.bit-strickerei.de/packages/v3.8/backport
+http://dl-cdn.alpinelinux.org/alpine/v3.8/main
+http://dl-cdn.alpinelinux.org/alpine/v3.8/community

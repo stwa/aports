@@ -1,0 +1,28 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=meta.sr.ht
+pkgver=0.5.1
+pkgrel=0
+pkgdesc="sr.ht core account services"
+url="https://git.sr.ht/~sircmpwn/meta.sr.ht"
+arch="noarch"
+license="GPLv2"
+options="!check"
+depends="redis py-srht py-pgpy py-sshpubkeys py-pystache py-pyotp py-qrcode
+	py-redis py-bcrypt"
+makedepends="python3-dev py-setuptools"
+install=""
+source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+}
+
+sha512sums="3fd9c95cd0312c1bc107418b082c9f745534fabb46c8bfbbdc702f5f983e04c0121f4b96aba3c98c188810df748fa162a88d911c7c9013280f8173ae932b3d93  meta.sr.ht-0.5.1.tar.xz"

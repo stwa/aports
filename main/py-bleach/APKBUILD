@@ -1,0 +1,50 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-bleach
+_pkgname=bleach
+pkgver=2.1.3
+pkgrel=0
+pkgdesc="An easy whitelist-based HTML-sanitizing tool"
+url="http://pypi.python.org/pypi/bleach"
+arch="noarch"
+license="Apache-2.0"
+options="!check"
+depends="py-html5lib"
+makedepends="python2-dev python3-dev py-setuptools"
+subpackages="py3-$_pkgname:_py3 py2-$_pkgname:_py2"
+source="https://pypi.org/packages/source/b/bleach/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	python2 setup.py build
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+_py2() {
+	replaces="$pkgname"
+	depends="${depends//py-/py2-}"
+	_py python2
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="ff74fb3646709f20c79ea02e6d0fb93e2f204d3151a05f259b703050c10d410859af76acb470405f6fb7b55c8fb64595e6f0fcf8e9cb8fd3fc3722fa30a47de5  bleach-2.1.3.tar.gz"

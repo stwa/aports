@@ -1,0 +1,43 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-pyotp
+_pkgname=pyotp
+pkgver=2.1.1
+pkgrel=0
+pkgdesc="PyOTP is a Python library for generating and verifying one-time passwords"
+url="https://pyotp.readthedocs.io/"
+arch="noarch"
+license="MIT"
+options="!check"
+depends="py-future"
+makedepends="python3-dev py-setuptools"
+subpackages="py3-$_pkgname:_py3"
+source="$_pkgname-$pkgver.tar.gz::https://github.com/pyotp/$_pkgname/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="3dc92494ebe70b1430a1b2b5c01e2e079b6cd366cdd197f2ccc0941a0a3d37faffb28ac76e8302852d3425011122042b580d367fdd6a6c6396c86f6e6edf96dd  pyotp-2.1.1.tar.gz"

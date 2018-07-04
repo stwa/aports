@@ -1,0 +1,43 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-pgpy
+_pkgname=pgpy
+pkgver=0.4.1
+pkgrel=0
+pkgdesc="Pretty Good Privacy for Python - a pure Python OpenPGP implementation"
+url="https://github.com/SecurityInnovation/PGPy"
+arch="noarch"
+license="BSD"
+options="!check"
+depends="py-cryptography py-six py-asn1"
+makedepends="python3-dev py-setuptools"
+subpackages="py3-$_pkgname:_py3"
+source="https://github.com/SecurityInnovation/PGPy/releases/download/$pkgver/PGPy-$pkgver.tar.gz"
+builddir="$srcdir/PGPy-$pkgver"
+
+build() {
+	cd "$builddir"
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="45fbf7c65af7e0b86bd56275ed7af020506774703bbca08adf742cccaf84dbb40c7883fbffe85d2298a4d70013c74ea97c60aa1a1181acd6c0ea6f8067065ec2  PGPy-0.4.1.tar.gz"

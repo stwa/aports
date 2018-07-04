@@ -1,0 +1,43 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-sshpubkeys
+_pkgname=sshpubkeys
+pkgver=2.2.0
+pkgrel=0
+pkgdesc="Decodes various OpenSSH public key formats"
+url="https://pypi.org/project/sshpubkeys/"
+arch="noarch"
+license="BSD"
+options="!check"
+depends="py-crypto py-ecdsa"
+makedepends="python3-dev py-setuptools"
+subpackages="py3-$_pkgname:_py3"
+source="$_pkgname-$pkgver.tar.gz::https://github.com/ojarva/python-sshpubkeys/archive/v$pkgver.tar.gz"
+builddir="$srcdir/python-$_pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="b1bfe62ed6a269b574671a54c83e51dbb4f002776505c861d7ebf395a581ff765901b2c2eb85dd1526d9026d196e688810eef15abdeef778a37d2890f9261a1f  sshpubkeys-2.2.0.tar.gz"

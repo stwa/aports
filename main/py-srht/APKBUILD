@@ -1,0 +1,53 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-srht
+_pkgname=srht
+pkgver=0.3.3
+pkgrel=0
+pkgdesc="sr.ht shared code"
+url="https://git.sr.ht/~sircmpwn/srht"
+arch="noarch"
+license="BSD"
+options="!check"
+depends="py-flask py-humanize py-sqlalchemy py-sqlalchemy-utils py-bleach
+	py-markdown py-requests py-beautifulsoup4"
+makedepends="python3-dev py-setuptools npm"
+subpackages="py3-$_pkgname:_py3"
+source="http://git.sr.ht/~sircmpwn/$_pkgname/snapshot/$_pkgname-$pkgver.tar.xz
+	bootstrap-4.1.1.tar.gz::https://github.com/twbs/bootstrap/archive/v4.1.1.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+	cd "$builddir"
+	rm -rf srht/scss/bootstrap
+	mv "$srcdir"/bootstrap-4.1.1 srht/scss/bootstrap
+}
+
+build() {
+	cd "$builddir"
+	PKGVER="$pkgver" python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	PKGVER="$pkgver" $python setup.py install --prefix=/usr --root="$subpkgdir" --optimize=1
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="7bc6d8470a6a96ded35d74ad33f25c7555fec9a593075cde15e57334202e5c18507fac482f02b6edaaa73882647f667d43d5f37f620c2cb41b1ddee61eb137e1  srht-0.3.3.tar.xz
+b25317213b208ebdabe2cb9072367fa390824fb436717c8f1ce7d9d54fbfc37dfc76c6699961ce9d8ecd2e8ab9a6cf82b779800347857fd706426b9ee22b96d1  bootstrap-4.1.1.tar.gz"

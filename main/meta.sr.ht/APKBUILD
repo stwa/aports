@@ -2,14 +2,14 @@
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=meta.sr.ht
 pkgver=0.5.1
-pkgrel=0
+pkgrel=1
 pkgdesc="sr.ht core account services"
 url="https://git.sr.ht/~sircmpwn/meta.sr.ht"
 arch="noarch"
 license="GPLv2"
 options="!check"
-depends="redis py-srht py-pgpy py-sshpubkeys py-pystache py-pyotp py-qrcode
-	py-redis py-bcrypt"
+depends="py3-srht py3-pgpy py3-sshpubkeys py3-pystache py3-pyotp py3-qrcode
+	py3-redis py3-bcrypt"
 makedepends="python3-dev py-setuptools"
 install=""
 source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz"

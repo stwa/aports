@@ -1,8 +1,8 @@
 # Contributor: Stefan Wagner <stw@bit-strickerei.de>
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=meta.sr.ht
-pkgver=0.5.1
-pkgrel=1
+pkgver=0.9.4
+pkgrel=0
 pkgdesc="sr.ht core account services"
 url="https://git.sr.ht/~sircmpwn/meta.sr.ht"
 arch="noarch"
@@ -23,6 +23,7 @@ build() {
 package() {
 	cd "$builddir"
 	python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/meta.ini.example
 }
 
-sha512sums="3fd9c95cd0312c1bc107418b082c9f745534fabb46c8bfbbdc702f5f983e04c0121f4b96aba3c98c188810df748fa162a88d911c7c9013280f8173ae932b3d93  meta.sr.ht-0.5.1.tar.xz"
+sha512sums="5a112dff5ea3acef1d4ca5197029a1d332a7b410b83122ccbf3037ce7766fcf961d14a4ecd2e7f2047280fb40941c092a36ce31b19c6e3e658a6fd6d340cf693  meta.sr.ht-0.9.4.tar.xz"

@@ -3,13 +3,12 @@
 pkgname=py-pystache
 _realname=pystache
 pkgver=0.5.4
-pkgrel=0
+pkgrel=1
 pkgdesc="Pystache is a Python implementation of Mustache."
 url="https://pypi.python.org/pypi/pystache"
 arch="noarch"
 license="MIT"
 options="!check"
-depends="python"
 makedepends="python2-dev python3-dev py-setuptools"
 subpackages="py2-${pkgname#py-}:_py2 py3-${pkgname#py-}:_py3"
 source="https://files.pythonhosted.org/packages/source/${_realname:0:1}/$_realname/$_realname-$pkgver.tar.gz"

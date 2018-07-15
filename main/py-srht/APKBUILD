@@ -1,8 +1,8 @@
 # Contributor: Stefan Wagner <stw@bit-strickerei.de>
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=py-srht
-_pkgname=srht
-pkgver=0.18.1
+_pkgname=core.sr.ht
+pkgver=0.18.7
 pkgrel=0
 pkgdesc="sr.ht shared code"
 url="https://git.sr.ht/~sircmpwn/srht"
@@ -49,5 +49,5 @@ _py3() {
 	_py python3
 }
 
-sha512sums="2d36a2cb52144ea5f12c5839ec78b6851662e8b7095d69ad5556bfe3f5dad01ea0ba196c2ab9beff36a984d0645e9f4e4e6fb58c8f5641de35c801cf6e83c370  srht-0.18.1.tar.xz
+sha512sums="9c4f16773cfb0be3c7687991443370431bc10aa18dba2f5a42e1cf4b70f29da48f71248ccd28e046dabcb726352303f3fecaec3f888ea477f497ab14073ff5b9  core.sr.ht-0.18.7.tar.xz
 b25317213b208ebdabe2cb9072367fa390824fb436717c8f1ce7d9d54fbfc37dfc76c6699961ce9d8ecd2e8ab9a6cf82b779800347857fd706426b9ee22b96d1  bootstrap-4.1.1.tar.gz"

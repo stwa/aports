@@ -29,7 +29,8 @@ sshfs "$REMOTE" "$MOUNT_DIR" \
 	-o idmap=user \
 	-o allow_other \
 	-o IdentityFile="$(pwd)/.travis/deploy-key" \
-	-o StrictHostKeyChecking=no
+	-o StrictHostKeyChecking=no \
+	-o AddressFamily=inet
 echo ' done'
 
 

@@ -1,6 +1,6 @@
 # Contributor: Stefan Wagner <stw@bit-strickerei.de>
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
-pkgname=py-srht
+pkgname=py-core.sr.ht
 _pkgname=core.sr.ht
 pkgver=0.18.7
 pkgrel=0

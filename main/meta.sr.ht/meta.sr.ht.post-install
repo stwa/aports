@@ -1,0 +1,3 @@
+#!/bin/sh
+addgroup -S metasrht || true
+adduser -SDH -s /sbin/nologin -g metasrht metasrht || true

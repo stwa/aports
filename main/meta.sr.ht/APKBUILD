@@ -2,17 +2,19 @@
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=meta.sr.ht
 pkgver=0.9.4
-pkgrel=1
+pkgrel=2
 pkgdesc="sr.ht core account services"
 url="https://git.sr.ht/~sircmpwn/meta.sr.ht"
 arch="noarch"
 license="GPLv2"
 options="!check"
 depends="py3-core.sr.ht py3-pgpy py3-sshpubkeys py3-pystache py3-pyotp py3-qrcode
-	py3-redis py3-bcrypt"
+	py3-redis py3-bcrypt py3-flask-login"
 makedepends="python3-dev py-setuptools"
-install=""
-source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz"
+install="$pkgname.post-install $pkgname.post-upgrade"
+source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz
+	meta.sr.ht.initd
+	"
 builddir="$srcdir/$pkgname-$pkgver"
 
 build() {
@@ -23,7 +25,11 @@ build() {
 package() {
 	cd "$builddir"
 	python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
-	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/meta.ini.example
+	install -Dm755 "$srcdir"/meta.sr.ht.initd "$pkgdir"/etc/init.d/meta.sr.ht
+	mkdir -p "$pkgdir"/etc/sr.ht "$pkgdir"/etc/sr.ht/alembic/
+	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/meta.ini
+	install -Dm644 alembic.ini.example "$pkgdir"/etc/sr.ht/alembic/meta.ini
 }
 
-sha512sums="5a112dff5ea3acef1d4ca5197029a1d332a7b410b83122ccbf3037ce7766fcf961d14a4ecd2e7f2047280fb40941c092a36ce31b19c6e3e658a6fd6d340cf693  meta.sr.ht-0.9.4.tar.xz"
+sha512sums="5a112dff5ea3acef1d4ca5197029a1d332a7b410b83122ccbf3037ce7766fcf961d14a4ecd2e7f2047280fb40941c092a36ce31b19c6e3e658a6fd6d340cf693  meta.sr.ht-0.9.4.tar.xz
+c149ba165ce153a13f55ce4b46427e6a7f7dc97ce7bbd776e6d56255b90edb52cc02f80c83e59dd11a67efd1ef0fe9e2a2812ca171d215df15513a1ca60ba597  meta.sr.ht.initd"

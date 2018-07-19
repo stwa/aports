@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+name="meta.sr.ht"
+description="meta.sr.ht service"
+
+# Override these with /etc/conf.d/meta.sr.ht
+META_USER=${META_USER:-metasrht}
+META_BIND=${META_BIND:-127.0.0.1:5000}
+LOCAL_PG=${LOCAL_PG:-yes}
+
+depend() {
+	need net
+	need redis
+	[ "$LOCAL_PG" == "yes" ] && need postgresql
+}
+
+start() {
+	ebegin "Starting $name"
+	start-stop-daemon \
+		-u ${META_USER} \
+		--background \
+		--make-pidfile \
+		--pidfile /run/$name.pid \
+		--exec /usr/bin/gunicorn -- \
+			metasrht.app:app -b ${META_BIND}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping $name"
+	start-stop-daemon --stop --exec /usr/bin/gunicorn --pidfile /run/$name.pid
+	eend $?
+}

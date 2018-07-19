@@ -1,0 +1,2 @@
+#!/bin/sh
+alembic-3 -c /etc/sr.ht/alembic/meta.ini upgrade head

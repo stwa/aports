@@ -2,7 +2,7 @@
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=meta.sr.ht
 pkgver=0.9.4
-pkgrel=2
+pkgrel=3
 pkgdesc="sr.ht core account services"
 url="https://git.sr.ht/~sircmpwn/meta.sr.ht"
 arch="noarch"
@@ -10,15 +10,22 @@ license="GPLv2"
 options="!check"
 depends="py3-core.sr.ht py3-pgpy py3-sshpubkeys py3-pystache py3-pyotp py3-qrcode
 	py3-redis py3-bcrypt py3-flask-login"
-makedepends="python3-dev py-setuptools"
+makedepends="python3-dev py-setuptools nodejs sassc"
 install="$pkgname.post-install $pkgname.post-upgrade"
 source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz
 	meta.sr.ht.initd
 	"
 builddir="$srcdir/$pkgname-$pkgver"
 
+prepare() {
+	default_prepare
+	cd "$builddir"
+	ln -s /usr/lib/python3.6/site-packages/srht/scss/font-awesome.min.css scss/_font-awesome.min.scss
+}
+
 build() {
 	cd "$builddir"
+	make
 	python3 setup.py build
 }
 

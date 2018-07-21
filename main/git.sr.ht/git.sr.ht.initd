@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+name="git.sr.ht"
+description="git.sr.ht service"
+
+# Override these with /etc/conf.d/git.sr.ht
+GIT_USER=${GIT_USER:-gitsrht}
+GIT_BIND=${GIT_BIND:-127.0.0.1:5000}
+LOCAL_PG=${LOCAL_PG:-yes}
+
+depend() {
+	need net
+	need redis
+	[ "$LOCAL_PG" == "yes" ] && need postgresql
+}
+
+start() {
+	ebegin "Starting $name"
+	start-stop-daemon \
+		-u ${GIT_USER} \
+		--background \
+		--make-pidfile \
+		--pidfile /run/$name.pid \
+		--exec /usr/bin/gunicorn -- \
+			gitsrht.app:app -b ${GIT_BIND}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping $name"
+	start-stop-daemon --stop --exec /usr/bin/gunicorn --pidfile /run/$name.pid
+	eend $?
+}

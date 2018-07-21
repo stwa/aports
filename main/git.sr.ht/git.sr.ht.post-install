@@ -1,0 +1,3 @@
+#!/bin/sh
+addgroup -S gitsrht || true
+adduser -SDH -s /sbin/nologin -g gitsrht gitsrht || true

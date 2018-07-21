@@ -1,0 +1,44 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=git.sr.ht
+pkgver=0.13.11
+pkgrel=0
+pkgdesc="sr.ht git services"
+url="https://git.sr.ht/~sircmpwn/git.sr.ht"
+arch="noarch"
+license="GPLv2"
+options="!check"
+depends="py3-core.sr.ht py3-flask-login py3-pygit2"
+makedepends="python3-dev py-setuptools nodejs sassc"
+install="$pkgname.post-install $pkgname.post-upgrade"
+source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz
+	git.sr.ht.initd
+	10-git.sr.ht
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+	cd "$builddir"
+	ln -s /usr/lib/python3.6/site-packages/srht/scss/font-awesome.min.css scss/_font-awesome.min.scss
+}
+
+build() {
+	cd "$builddir"
+	make
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+	install -Dm755 "$srcdir"/git.sr.ht.initd "$pkgdir"/etc/init.d/git.sr.ht
+	install -Dm644 "$srcdir"/10-git.sr.ht "$pkgdir"/etc/cron.d/10-git.sr.ht
+	mkdir -p "$pkgdir"/etc/sr.ht "$pkgdir"/etc/sr.ht/alembic/
+	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/git.ini
+	install -Dm644 alembic.ini.example "$pkgdir"/etc/sr.ht/alembic/git.ini
+}
+
+sha512sums="958ee7008537e9025d5d772d4a5886bf655ebe5c949b879c182b93784635c14fc259ac22368c1c6e83b5a376b084c3eae7f5391472a36498ebc99ce3624287db  git.sr.ht-0.13.11.tar.xz
+797f7d1ecc6d21f992eda6a420ebd0b373e8050cd05ddc35c64f76e1302ce17aa732ea55ffa3ab5cd854f8711fcc24dcb78b142a84272c919427e69d343f91a1  git.sr.ht.initd
+56ac572d260abfca1b5c4e4787307557e8f3281264686f7448a1ef6af08d533cb50fa11bbea2d7d0c488ed04c54ae3a810449d17bd19cfae84f98c0866707b81  10-git.sr.ht"

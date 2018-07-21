@@ -1,0 +1,49 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-celery
+_pkgname=celery
+pkgver=0.4.1
+pkgrel=0
+pkgdesc="Distributed Asyncronous Task Queue"
+url="http://celeryproject.org"
+arch="noarch"
+license="BSD"
+options="!check"
+depends="py-billiard py-tz py-kombu"
+makedepends="python2-dev python3-dev py-setuptools"
+subpackages="py2-$_pkgname:_py2 py3-$_pkgname:_py3"
+source="https://pypi.io/packages/source/c/celery/celery-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	python2 setup.py build
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+_py2() {
+	depends="${depends//py-/py2-}"
+	_py python2
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="04f4e4315186970431cb46af513eb8b43cb0299b1c96493ef0919069bdc511c63f84ca7493fb19bc5225ae81e13d81e6f84fafc82fdfb639ae2d0aaeea038b33  celery-0.4.1.tar.gz"

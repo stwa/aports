@@ -1,7 +1,7 @@
 # Contributor: Stefan Wagner <stw@bit-strickerei.de>
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=grafana
-pkgver=5.0.1
+pkgver=5.2.1
 pkgrel=0
 pkgdesc="Gorgeous metric viz, dashboards & editors for Graphite, InfluxDB & Prometheus"
 url="http://grafana.org/"
@@ -11,6 +11,7 @@ makedepends="go yarn python2"
 pkgusers="grafana"
 pkggroups="grafana"
 install="$pkgname.pre-install"
+options="!check"
 source="$pkgname-$pkgver.zip::https://github.com/grafana/$pkgname/archive/v$pkgver.zip
 	grafana-server.initd"
 builddir="$srcdir/$pkgname-$pkgver"
@@ -38,9 +39,9 @@ build() {
 package() {
 	cd "$builddir"
 
-	install -Dm755 bin/grafana-server \
+	install -Dm755 bin/linux-amd64/grafana-server \
 		"$pkgdir/usr/bin/grafana-server" || return 1
-	install -Dm755 bin/grafana-cli \
+	install -Dm755 bin/linux-amd64/grafana-cli \
 		"$pkgdir/usr/bin/grafana-cli" || return 1
 	install -Dm644 conf/sample.ini \
 		"$pkgdir/etc/$pkgname.ini" || return 1
@@ -58,5 +59,5 @@ package() {
 		 "$pkgdir/etc/init.d/$pkgname-server" || return 1
 }
 
-sha512sums="bcf2e1583fa99c04662d40f221c12fc60b8e30c9e1d82b5c9993563b0b116bbcfb0b66f783350edc918b179bf59998888fe9d519c00c0cc29ae2602294d574a6  grafana-5.0.1.zip
+sha512sums="6254464ab53a4ac5b0ad0fdda550277f1acce836b0320e295d32e20a938e3c0f9015fb1f127e010d59e9fa180d1027873a52f8eaf2529f89ca6d74412bdb01d7  grafana-5.2.1.zip
 1549d6159511954f8ef147254b24125b47d224e63cefbc086a047deae9a891543369670fb80d2072592bf17fdf120c6e9e1d879e3e1d445e3ac0f8fb3bd3a757  grafana-server.initd"

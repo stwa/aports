@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+name="srht-runner"
+description="builds.sr.ht build runner service"
+
+depend() {
+	need net
+}
+
+nproc() {
+	grep "core id" /proc/cpuinfo | wc -l
+}
+
+start() {
+	ebegin "Starting $name"
+	start-stop-daemon --background --make-pidfile --pidfile /run/$name.pid -u builds \
+		--exec /usr/bin/celery -- \
+		-A buildsrht.runner worker --loglevel=info -c $(nproc)
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping $name"
+	start-stop-daemon --stop --exec /usr/bin/celery --pidfile /run/$name.pid
+	eend $?
+}

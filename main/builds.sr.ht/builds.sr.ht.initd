@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+name="builds.sr.ht"
+description="builds.sr.ht service"
+
+# Override these with /etc/conf.d/git.sr.ht
+BUILDS_USER=${BUILDS_USER:-buildsrht}
+BUILDS_BIND=${BUILDS_BIND:-127.0.0.1:5000}
+LOCAL_PG=${LOCAL_PG:-yes}
+
+depend() {
+	need net
+	need redis
+	[ "$LOCAL_PG" == "yes" ] && need postgresql
+}
+
+start() {
+	ebegin "Starting $name"
+	start-stop-daemon \
+		-u ${BUILDS_USER} \
+		--background \
+		--make-pidfile \
+		--pidfile /run/$name.pid \
+		--exec /usr/bin/gunicorn -- \
+			buildsrht.app:app -b ${BUILDS_BIND}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping $name"
+	start-stop-daemon --stop --exec /usr/bin/gunicorn --pidfile /run/$name.pid
+	eend $?
+}

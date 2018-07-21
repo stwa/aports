@@ -1,0 +1,44 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=builds.sr.ht
+pkgver=0.10.1
+pkgrel=0
+pkgdesc="sr.ht build services"
+url="https://git.sr.ht/~sircmpwn/builds.sr.ht"
+arch="noarch"
+license="GPLv2"
+options="!check"
+depends="py3-core.sr.ht py3-pgpy py3-celery py3-redis py3-yaml py3-markdown py3-bleach"
+makedepends="python3-dev py-setuptools nodejs sassc"
+install="$pkgname.pre-install $pkgname.post-upgrade"
+source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz
+	builds.sr.ht.initd
+	builds.sr.ht-runner.initd
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+	cd "$builddir"
+	ln -s /usr/lib/python3.6/site-packages/srht/scss/font-awesome.min.css scss/_font-awesome.min.scss
+}
+
+build() {
+	cd "$builddir"
+	make
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+	install -Dm755 "$srcdir"/builds.sr.ht.initd "$pkgdir"/etc/init.d/builds.sr.ht
+	install -Dm755 "$srcdir"/builds.sr.ht-runner.initd "$pkgdir"/etc/init.d/builds.sr.ht-runner
+	mkdir -p "$pkgdir"/etc/sr.ht "$pkgdir"/etc/sr.ht/alembic/
+	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/builds.ini
+	install -Dm644 alembic.ini.example "$pkgdir"/etc/sr.ht/alembic/builds.ini
+}
+
+sha512sums="6412dab7014560ff3b2aa78689fd61129faceedf0cc2aaaaf990e1b595d4bf0ff515bed94e0bd8b08cf82b0ecdc744bb217be106efa57f443114df7f06e178bc  builds.sr.ht-0.10.1.tar.xz
+417b639c946fa8d4ec90c5e02822f4a49cf4cb27004f2e1b6f7e1d5dc108a7790850f603068c3e642d031e1130b495e16a438cb3fd459036d018e6ed375c3455  builds.sr.ht.initd
+9a46e63e9cb24dc48c6e96d8b674a2481374c68568230ebda9e042624ff80406638a5da071e7b92769fe4feb71d5fa276d2d4ed47012fca2107d5d42ef48d6b1  builds.sr.ht-runner.initd"

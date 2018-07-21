@@ -1,0 +1,3 @@
+#!/bin/sh
+addgroup -S builds || true
+adduser -SDH -s /sbin/nologin -g builds builds || true

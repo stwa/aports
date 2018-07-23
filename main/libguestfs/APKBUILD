@@ -1,0 +1,56 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=libguestfs
+pkgver=1.38.2
+pkgrel=0
+pkgdesc="Access and modify virtual machine disk image"
+url="http://libguestfs.org"
+arch="all"
+license="GPL2"
+depends=""
+makedepends="augeas-dev bash bison cdrkit coreutils file-dev flex fuse-dev
+	gettext-dev gperf gzip hivex-dev libvirt-dev ncurses-dev ocaml
+	ocaml-findlib pcre-dev perl portablexdr-dev qemu qemu-img
+	qemu-system-x86_64 xz yajl-dev
+	"
+options="!check"
+install=""
+subpackages="$pkgname-dev $pkgname-doc"
+source="http://libguestfs.org/download/${pkgver%.*}-stable/$pkgname-$pkgver.tar.gz
+	error.patch
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	PYTHON=python2 \
+	./configure \
+		--prefix=/usr \
+		--libdir=/usr/lib \
+		--mandir=/usr/share/man \
+		--sysconfdir=/etc \
+		--enable-introspection=no \
+		--disable-static \
+		--disable-probes \
+		--disable-appliance \
+		--disable-daemon \
+		--disable-perl \
+		--disable-lua \
+		--disable-erlang \
+		--disable-php \
+		--disable-haskell \
+		--disable-ruby \
+		--disable-gobject \
+		--disable-golang \
+		--without-java
+	make
+}
+
+package() {
+	cd "$builddir"
+	make DESTDIR="$pkgdir" install
+	rm "$pkgdir"/usr/lib/charset.alias
+}
+
+sha512sums="1e9ed5d07baa25cab4ccc0c12c9f4c90ef35ff760814d672975952d098cd84b3e81c70cfe65a9c6c34de84725f29861bfe08ed72c9f9eb03f19313bdaacf2d05  libguestfs-1.38.2.tar.gz
+4cea8c5ce409fcd05ea4092e102f203f0e54ff832a96dbaa30e452b3d3df4507aa1a57a53424ac2b2af8d734df7f22cc30df50691720977a6dca52ab922682e4  error.patch"

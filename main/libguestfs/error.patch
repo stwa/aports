@@ -1,0 +1,9 @@
+diff -Nur a/lib/error.h b/lib/error.h
+--- a/lib/error.h	1970-01-01 01:00:00.000000000 +0100
++++ b/lib/error.h	2018-07-24 00:01:47.459613867 +0200
+@@ -0,0 +1,5 @@
++#define error(status, errno, ...) warn(status, __VA_ARGS__)
++//#define error(status, errno, ...) \
++//	fflush(stdout); \
++//	warn(__VA_ARGS__); \
++//	if (errno) exit(errno);

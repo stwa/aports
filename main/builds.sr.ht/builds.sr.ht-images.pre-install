@@ -1,0 +1,3 @@
+#!/bin/sh
+addgroup -S runner || true
+adduser -SDH -s /sbin/nologin -g runner runner || true

@@ -11,6 +11,7 @@ options="!check"
 depends="py3-core.sr.ht py3-pgpy py3-celery py3-redis py3-yaml py3-markdown py3-bleach"
 makedepends="python3-dev py-setuptools nodejs sassc"
 install="$pkgname.pre-install $pkgname.post-upgrade"
+subpackages="$pkgname-images:images"
 source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz
 	builds.sr.ht.initd
 	builds.sr.ht-runner.initd
@@ -38,6 +39,17 @@ package() {
 	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/builds.ini
 	install -Dm644 alembic.ini.example "$pkgdir"/etc/sr.ht/alembic/builds.ini
 }
+
+images() {
+	description="Stock build images for builds.sr.ht runners"
+	depends="$pkgname docker"
+	install="$subpkgname.pre-install"
+
+	cd "$builddir"
+	mkdir -p "$subpkgdir/var/lib/sr.ht"
+	cp -R images "$subpkgdir"/var/lib/sr.ht/images
+}
+
 
 sha512sums="6412dab7014560ff3b2aa78689fd61129faceedf0cc2aaaaf990e1b595d4bf0ff515bed94e0bd8b08cf82b0ecdc744bb217be106efa57f443114df7f06e178bc  builds.sr.ht-0.10.1.tar.xz
 417b639c946fa8d4ec90c5e02822f4a49cf4cb27004f2e1b6f7e1d5dc108a7790850f603068c3e642d031e1130b495e16a438cb3fd459036d018e6ed375c3455  builds.sr.ht.initd

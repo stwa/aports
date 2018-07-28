@@ -1,0 +1,11 @@
+diff -ur a/extensions/libebt_vlan.c b/extensions/libebt_vlan.c
+--- a/extensions/libebt_vlan.c	2018-07-28 15:56:17.912255899 +0200
++++ b/extensions/libebt_vlan.c	2018-07-28 15:56:32.449229626 +0200
+@@ -14,7 +14,6 @@
+ #include <xtables.h>
+ #include <ebtables/ethernetdb.h>
+ #include <linux/netfilter_bridge/ebt_vlan.h>
+-#include <linux/if_ether.h>
+ #include "iptables/nft.h"
+ #include "iptables/nft-bridge.h"
+ 

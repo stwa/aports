@@ -2,7 +2,7 @@
 # Maintainer: Stefan Wagner <stw@bit-strickerei.de>
 pkgname=py-celery
 _pkgname=celery
-pkgver=0.4.1
+pkgver=4.2.1
 pkgrel=0
 pkgdesc="Distributed Asyncronous Task Queue"
 url="http://celeryproject.org"
@@ -46,4 +46,4 @@ _py3() {
 	_py python3
 }
 
-sha512sums="04f4e4315186970431cb46af513eb8b43cb0299b1c96493ef0919069bdc511c63f84ca7493fb19bc5225ae81e13d81e6f84fafc82fdfb639ae2d0aaeea038b33  celery-0.4.1.tar.gz"
+sha512sums="474733200e0f6aadbfab5deeb43ee563618687792d43219ebc81a53084ad491cafa410d6bb56153c3d14c76d358ce119f0055ee9b6c31e6becfe8ddf2d2178ad  celery-4.2.1.tar.gz"

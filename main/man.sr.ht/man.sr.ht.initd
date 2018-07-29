@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+name="man.sr.ht"
+description="man.sr.ht service"
+
+# Override these with /etc/conf.d/man.sr.ht
+MAN_USER=${MAN_USER:-mansrht}
+MAN_BIND=${MAN_BIND:-127.0.0.1:5004}
+LOCAL_PG=${LOCAL_PG:-yes}
+
+depend() {
+	need net
+	need redis
+	[ "$LOCAL_PG" == "yes" ] && need postgresql
+}
+
+start() {
+	ebegin "Starting $name"
+	start-stop-daemon \
+		-u ${MAN_USER} \
+		--background \
+		--make-pidfile \
+		--pidfile /run/$name.pid \
+		--exec /usr/bin/gunicorn -- \
+			mansrht.app:app -b ${MAN_BIND}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping $name"
+	start-stop-daemon --stop --exec /usr/bin/gunicorn --pidfile /run/$name.pid
+	eend $?
+}

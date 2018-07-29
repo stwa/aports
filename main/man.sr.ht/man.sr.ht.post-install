@@ -1,0 +1,3 @@
+#!/bin/sh
+addgroup -S mansrht || true
+adduser -SDH -s /sbin/nologin -g mansrht mansrht || true

@@ -1,0 +1,41 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=man.sr.ht
+pkgver=0.3.1
+pkgrel=0
+pkgdesc="sr.ht wiki services"
+url="https://git.sr.ht/~sircmpwn/man.sr.ht"
+arch="noarch"
+license="GPLv2"
+options="!check"
+depends="py3-core.sr.ht py3-flask-login py3-pygit2"
+makedepends="python3-dev py-setuptools nodejs sassc"
+install="$pkgname.post-install $pkgname.post-upgrade"
+source="http://git.sr.ht/~sircmpwn/$pkgname/snapshot/$pkgname-$pkgver.tar.xz
+	man.sr.ht.initd
+	"
+builddir="$srcdir/$pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+	cd "$builddir"
+	ln -s /usr/lib/python3.6/site-packages/srht/scss/font-awesome.min.css scss/_font-awesome.min.scss
+}
+
+build() {
+	cd "$builddir"
+	make
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	python3 setup.py install --prefix=/usr --root="$pkgdir" --optimize=1
+	install -Dm755 "$srcdir"/man.sr.ht.initd "$pkgdir"/etc/init.d/man.sr.ht
+	mkdir -p "$pkgdir"/etc/sr.ht "$pkgdir"/etc/sr.ht/alembic/
+	install -Dm644 config.ini.example "$pkgdir"/etc/sr.ht/man.ini
+	install -Dm644 alembic.ini.example "$pkgdir"/etc/sr.ht/alembic/man.ini
+}
+
+sha512sums="ea3ee31270c6c2ae7625212ecf7e159a9aa6a8fbb2e5cc4c245a68e9323c3b2b0313a018bdabd37e61e6f6620e1c5f5791392a9f65194d9c86a295b7d69aff53  man.sr.ht-0.3.1.tar.xz
+198cae0946e75bf914441cc3e4309d73341ef5e8413674b3edd2c8bc731804a35b64de58805e154c1a293b9fc53473cd9bb9db8c2e6b38933008a90225c04c35  man.sr.ht.initd"

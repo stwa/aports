@@ -46,5 +46,7 @@ alpine_run $ALPINE_USER <<-EOF
 	mkdir -p ~/.abuild
 	echo "PACKAGER_PRIVKEY=$packager_privkey" > ~/.abuild/abuild.conf
 
+	ls -la $CLONE_DIR
+	echo buildrepo -a $CLONE_DIR -d $PACKAGES_DIR $repos
 	REPODEST=$PACKAGES_DIR buildrepo -a $CLONE_DIR -d $PACKAGES_DIR $repos
 EOF

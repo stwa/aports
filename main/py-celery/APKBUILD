@@ -3,16 +3,16 @@
 pkgname=py-celery
 _pkgname=celery
 pkgver=4.2.1
-pkgrel=0
+pkgrel=1
 pkgdesc="Distributed Asyncronous Task Queue"
 url="http://celeryproject.org"
 arch="noarch"
 license="BSD"
 options="!check"
-depends="py-billiard py-tz py-kombu"
+depends="py-billiard py-tz py-kombu py-vine"
 makedepends="python2-dev python3-dev py-setuptools"
 subpackages="py2-$_pkgname:_py2 py3-$_pkgname:_py3"
-source="https://pypi.io/packages/source/c/celery/celery-$pkgver.tar.gz"
+source="https://pypi.io/packages/source/c/celery/$_pkgname-$pkgver.tar.gz"
 builddir="$srcdir/$_pkgname-$pkgver"
 
 build() {

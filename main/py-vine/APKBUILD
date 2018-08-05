@@ -1,0 +1,49 @@
+# Contributor: Stefan Wagner <stw@bit-strickerei.de>
+# Maintainer: Stefan Wagner <stw@bit-strickerei.de>
+pkgname=py-vine
+_pkgname=vine
+pkgver=1.1.4
+pkgrel=0
+pkgdesc="Promises, promises, promises"
+url="https://github.com/celery/vine"
+arch="noarch"
+license="BSD"
+options="!check"
+depends=""
+makedepends="python2-dev python3-dev py-setuptools"
+subpackages="py2-$_pkgname:_py2 py3-$_pkgname:_py3"
+source="https://pypi.io/packages/source/v/vine/$_pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	cd "$builddir"
+	python2 setup.py build
+	python3 setup.py build
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+}
+
+_py() {
+	local python="$1"
+	pkgdesc="$pkgdesc ${python#python}"
+	depends="$depends $python"
+	install_if="$pkgname=$pkgver-r$pkgrel $python"
+
+	cd "$builddir"
+	$python setup.py install --prefix=/usr --root="$subpkgdir"
+}
+
+_py2() {
+	depends="${depends//py-/py2-}"
+	_py python2
+}
+
+_py3() {
+	depends="${depends//py-/py3-}"
+	_py python3
+}
+
+sha512sums="b85438cd30b3cb6c642380b3da120783cf2d4306366e04a141061d40cf6b8ce5b52ca15562b71f28392ad376c1f160b39162fa7933665b5c21179b0994347460  vine-1.1.4.tar.gz"
